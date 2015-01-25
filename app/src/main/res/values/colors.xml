@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="pressed_styled">#CC669900</color>
+    <color name="color_green">#99cc00</color>
+    <color name="color_green_darker">#690</color>
+    <color name="color_gray">#c8ccbb</color>
+    <color name="color_red">#ff0000</color>
+    <color name="swipe_color_1">#B6DB49</color>
+    <color name="swipe_color_2">#99CC00</color>
+    <color name="swipe_color_3">#8ABD00</color>
+    <color name="swipe_color_4">#7CAF00</color>
+    <color name="gradient_start">#50000000</color>
+    <color name="material_blue_500">#5677fc</color>
+    <color name="material_blue_600">#4e6cef</color>
+    <color name="ripple">#ff80ab</color>
+    <color name="accent">#ff4081</color>
+    <color name="accent_pressed">#f50057</color>
+    <color name="color_grey">#FEEE</color>
+</resources>

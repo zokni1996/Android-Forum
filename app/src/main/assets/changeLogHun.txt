@@ -1,0 +1,42 @@
+<hr /><span style="font-size: 125%; line-height: 116%;"><span style="font-weight: bold"><div style="text-align: center;">• 1.0 •</div></span></span><br /><br />
+• kezdetleges verzió<br />
+<hr /><span style="font-size: 125%; line-height: 116%;"><span style="font-weight: bold"><div style="text-align: center;">• 1.1 •</div></span></span><br />
+• javítva a menü, mostmár ha nem fér el, akkor is van szöveg<br />javítva az eszközök listája, de még nem működik teljesen<br />
+• első indításnál egy pop-up ablak van, egy kis bemelegítéssel<br />• álló nézet minden esetben<br />
+• valamint egy kezdőlap gombot is hozzáadtam, hogy használni lehessen könyebben.<br />
+<hr /><span style="font-size: 125%; line-height: 116%;"><span style="font-weight: bold"><div style="text-align: center;">• 1.2 •</div></span></span><br />
+• ujjal való nagyítás engedélyezve<br />
+• beállítások menü feloldva, bár még nem megy<br />
+• a kezdőlap gomb megnyomására az előzmények törlődnek (fix)<br />
+• fórum olvasott-nak jelölése menü, de még nem megy...<br />
+<hr /><span style="font-size: 125%; line-height: 116%;"><span style="font-weight: bold"><div style="text-align: center;">• 1.3 •</div></span></span><br />
+• A beállítások minden funkciója működik<br />
+• jobban személyre szabható, így akár adatot is megtakaríthatsz<br />
+• a tabok rendben vannak, a következő verzióban a megfelelő topic is be fog töltődni<br />
+<hr /><span style="font-size: 125%; line-height: 116%;"><span style="font-weight: bold"><div style="text-align: center;">• 1.4 •</div></span></span><br />
+• Teljesen új felület! (vagyis amit eddig meg tudtam csinálni, azokat változtattam meg  :D )<br />
+• Egy about me... ha érted és szeretnéd elolvasni... 8-)<br />
+• Be lehet állítani, hogy a kijelző ne kapcsoljon ki, ha úgy akarod<br />
+• egy oldal újratöltés is hozzá lett adva, ami szerintem nagyon hasznos<br />
+• a kategóriákat eltávolítottam, mert másképp szeretném majd megcsinálni.<br />
+<hr /><span style="font-size: 125%; line-height: 116%;"><span style="font-weight: bold"><div style="text-align: center;">• 1.5 FINAL •</div></span></span><br />
+• Újraterveztem a Status bar-t, kivettem belőle a felesleges ikonokat<br />
+• A menü egy részét eltávolítottam, illetve ha kiférnek az ikonok a status bar-on, akkor a menü nem is látszik<br />
+• A beállításokat teljesen újraterveztem. Így mostmár tableteken is könnyebben kezelhető, külön kategóriákba tettem amit lehetett.<br />
+• Egy új kategória jelent meg, méghozzá az ÉRTESÍTÉSEK!!!<br />
+• A szabályzatot innentől kezdve offline el lehet érni, a megfelelő részekkel.<br />
+• A YouTube-ra feltöltött videóimat meg lehet nézni, tanulhatod, hogyan lehet fejleszteni Android alkalmazásokat<br />
+• A Rólam menüpontot áttettem, és jobban elrendeztem, könnyebb átláthatósággal.<br />
+• Rengeteg egyéb kis dolgot tettem az alkalmazásba, rengeteg hibajavításon esett át<br />
+• Angol nyelvre is elérhető az alkalmazás<br />
+<hr /><span style="font-size: 125%; line-height: 116%;"><span style="font-weight: bold"><div style="text-align: center;">• 2.0 •</div></span></span><br />
+• Anyagszerű kinézet<br />
+• Teljesen átdolgozva az alapoktól<br />
+• Rengeteg hibajavítás<br />
+• Mostmár gyorsabb, szebb is :)<br />
+• Új kategória: Kedvencek!<br />
+<hr /><span style="font-size: 125%; line-height: 116%;"><span style="font-weight: bold"><div style="text-align: center;">• 2.1.5 •</div></span></span><br />
+• Hibajavítások<br />
+• Új alkalmazás ikon <br />
+• Néhány Layout kijavítva <br />
+• Az értesítésben ha szeretnéd, akkor csak az utolsó téma jelenik meg, amibe a hozzászólás érkezett meg <br />

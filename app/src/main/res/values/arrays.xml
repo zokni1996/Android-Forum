@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="Zoom">
+        <item>100%</item>
+        <item>120%</item>
+        <item>140%</item>
+        <item>160%</item>
+    </string-array>
+    <string-array name="ZoomNumbers">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+    <string-array name="NotificationTimeCheck">
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>2 hour</item>
+    </string-array>
+    <string-array name="NotificationTimeCheckNumbers">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+    <string-array name="NotificationPriority">
+        <item>Default priority</item>
+        <item>Minimum priority</item>
+        <item>Medium priority</item>
+        <item>High priority</item>
+        <item>Max priority</item>
+    </string-array>
+    <string-array name="NotificationPriorityNumbers">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+    <string-array name="NotificationStyle">
+        <item>Topic name, date</item>
+        <item>Forum name, date</item>
+        <item>Topic name, forum name</item>
+        <item>Topic name, forum name, date</item>
+    </string-array>
+    <string-array name="NotificationStyleNumbers">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+    <string-array name="ParseNotificationChannel">
+        <item>Everybody</item>
+        <item>Moderators</item>
+    </string-array>
+
+    <string-array name="drawer_list">
+        <item>Forum main page</item>
+        <item>Favourites</item>
+        <item>New posts</item>
+        <item>Unanswered posts</item>
+        <item>Unread posts</item>
+        <item>Settings</item>
+    </string-array>
+</resources>

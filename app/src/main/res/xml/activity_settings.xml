@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <header
+        android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsWebViewScreen"
+        android:title="@string/WebViewScreen" />
+    <header
+        android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsScreen"
+        android:title="@string/ScreenSettings" />
+    <header
+        android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsNotification"
+        android:title="@string/NotificationSettings" />
+    <header
+        android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsRules"
+        android:title="@string/NameRules"/>
+    <header
+        android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsAbout"
+        android:title="@string/AboutMe" />
+    <header
+        android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsExtra"
+        android:title="@string/Extras"/>
+    <header
+        android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsDeveloper"
+        android:title="@string/ParseSettingsNotificationName"/>
+
+</preference-headers>

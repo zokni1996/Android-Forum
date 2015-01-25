@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="Zoom">
+        <item>100%</item>
+        <item>120%</item>
+        <item>140%</item>
+        <item>160%</item>
+    </string-array>
+    <string-array name="ZoomNumbers">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+    <string-array name="NotificationTimeCheck">
+        <item>5 perc</item>
+        <item>10 perc</item>
+        <item>30 perc</item>
+        <item>1 óra</item>
+        <item>2 óra</item>
+    </string-array>
+    <string-array name="NotificationTimeCheckNumbers">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+    <string-array name="NotificationPriority">
+        <item>Általános prioritás</item>
+        <item>Kis prioritás</item>
+        <item>Közepes prioritás</item>
+        <item>Magas prioritás</item>
+        <item>Max prioritás</item>
+    </string-array>
+    <string-array name="NotificationPriorityNumbers">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+    <string-array name="NotificationStyle">
+        <item>Topik név, dátum</item>
+        <item>Téma név, dátum</item>
+        <item>Topik név, téma név</item>
+        <item>Topik név, téma név, dátum</item>
+    </string-array>
+    <string-array name="NotificationStyleNumbers">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+    <string-array name="ParseNotificationChannel">
+        <item>Mindenki</item>
+        <item>Moderátorok</item>
+    </string-array>
+
+    <string-array name="drawer_list">
+        <item>Fórum kezdőlap</item>
+        <item>Kedvencek</item>
+        <item>Új hozzászólások</item>
+        <item>Megválaszolatlan hsz.-ek</item>
+        <item>Olvasatlan hsz.-ek</item>
+        <item>Beállítások</item>
+    </string-array>
+</resources>

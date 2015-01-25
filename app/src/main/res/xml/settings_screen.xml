@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/ScreenSettings">
+        <SwitchPreference
+            android:key="Screen"
+            android:summary="@string/ScreenSummary"
+            android:title="@string/Screen"/>
+        <CheckBoxPreference
+            android:key="OnKeyDown"
+            android:title="@string/ExitTitle"
+            android:summary="@string/ExitMessage"
+            android:defaultValue="true"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

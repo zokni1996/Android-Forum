@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@null"
+        android:id="@+id/imageViewIconID"
+        android:maxWidth="25sp"
+        android:maxHeight="25sp"
+        android:padding="10dp"
+        android:layout_alignBottom="@+id/textVewName"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/ic_action_action_home_holo_light" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:paddingBottom="15dp"
+        android:paddingTop="15dp"
+        android:text="@string/MenuSettings"
+        android:id="@+id/textVewName"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/imageViewIconID"
+        android:layout_toEndOf="@+id/imageViewIconID" />
+
+
+</RelativeLayout>

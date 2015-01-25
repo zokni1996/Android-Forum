@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/NotificationNameSettings"
+        android:icon="@drawable/ic_stat_af">
+        <SwitchPreference
+            android:title="@string/Notification"
+            android:summary="@string/NotificationSummary"
+            android:key="Notification" />
+        <ListPreference
+            android:title="@string/Refresh"
+            android:dependency="Notification"
+            android:entries="@array/NotificationTimeCheck"
+            android:key="NotificationTimeCheck"
+            android:entryValues="@array/NotificationTimeCheckNumbers"
+            android:summary="%s"
+            android:defaultValue="1" />
+        <ListPreference
+            android:title="@string/Priority"
+            android:dependency="Notification"
+            android:entries="@array/NotificationPriority"
+            android:entryValues="@array/NotificationPriorityNumbers"
+            android:key="NotificationPriority"
+            android:summary="%s"
+            android:defaultValue="1" />
+        <CheckBoxPreference
+            android:title="@string/OnlyLast"
+            android:summary="@string/OnlyLastSummer"
+            android:key="LastPostNotification"
+            android:dependency="Notification"/>
+        <CheckBoxPreference
+            android:title="@string/Vibrate"
+            android:summary="@string/VibrateSummary"
+            android:key="Vibrate"
+            android:dependency="Notification" />
+        <CheckBoxPreference
+            android:title="@string/Led"
+            android:summary="@string/LedSummary"
+            android:key="Led"
+            android:dependency="Notification" />
+        <CheckBoxPreference
+            android:title="@string/Sound"
+            android:summary="@string/SoundSummary"
+            android:key="Sound"
+            android:dependency="Notification" />
+        <ListPreference
+            android:title="@string/Style"
+            android:dependency="Notification"
+            android:entries="@array/NotificationStyle"
+            android:entryValues="@array/NotificationStyleNumbers"
+            android:key="NotificationStyle"
+            android:summary="%s"
+            android:defaultValue="4" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/ParseSwitchTitle">
+        <SwitchPreference
+            android:title="@string/ParseSwitchMaintenanceTitle"
+            android:summary="@string/ParseSwitchMaintenanceSummary"
+            android:key="NotificationParseMaintenance" />
+    </PreferenceCategory>
+</PreferenceScreen>

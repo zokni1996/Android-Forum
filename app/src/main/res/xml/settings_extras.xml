@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/DemoVideos">
+        <Preference
+            android:summary="@string/SettingsExtrasSummaryFirstOne"
+            android:key="KeyFirstOne" />
+        <Preference
+            android:summary="@string/SettingsExtrasSummaryFirstTwo"
+            android:key="KeyFirstTwo" />
+        <Preference
+            android:summary="@string/SettingsExtrasSummarySecondOne"
+            android:key="KeySecondOne" />
+        <Preference
+            android:summary="@string/SettingsExtrasSummarySecondTwo"
+            android:key="KeySecondTwo" />
+        <Preference
+            android:summary="@string/SettingsExtrasSummaryThirdOne"
+            android:key="KeyThirdOne" />
+        <Preference
+            android:summary="@string/SettingsExtrasSummaryThirdTwo"
+            android:key="KeyThirdTwo" />
+        <Preference
+            android:summary="@string/SettingsExtrasSummaryFourthOne"
+            android:key="KeyFourthOne" />
+        <Preference
+            android:summary="@string/SettingsExtrasSummaryFourthTwo"
+            android:key="KeyFourthTwo" />
+        <Preference
+            android:summary="@string/SettingsExtrasSummaryFifthOne"
+            android:key="KeyFifthOne" />
+        <Preference
+            android:summary="@string/SettingsExtrasSummaryFifthTwo"
+            android:key="KeyFifthTwo" />
+        <Preference
+            android:summary="@string/SettingsExtrasSummarySixthOne"
+            android:key="KeySixthOne" />
+        <Preference
+            android:summary="@string/SettingsExtrasSummarySixthTwo"
+            android:key="KeySixthTwo" />
+        <Preference
+            android:summary="@string/SettingsExtrasSummarySeventhOne"
+            android:key="KeySeventhOne" />
+        <Preference
+            android:summary="@string/SettingsExtrasSummarySeventhTwo"
+            android:key="KeySeventhTwo" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/YouTubePlayLists">
+        <Preference
+            android:title="@string/AndroidUpdate"
+            android:key="KeyChannelAndroidUpdate" />
+        <Preference
+            android:title="@string/AndroidAppTraining"
+            android:enabled="false" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/Feed">
+        <Preference
+            android:title="@string/Facebook"
+            android:key="Facebook" />
+        <Preference
+            android:title="@string/GooglePlus"
+            android:key="GooglePlus" />
+    </PreferenceCategory>
+</PreferenceScreen>
