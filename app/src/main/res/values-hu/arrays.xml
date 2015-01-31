@@ -60,7 +60,7 @@
     <string-array name="drawer_list">
         <item>Fórum kezdőlap</item>
         <item>Kedvencek</item>
-        <item>Új hozzászólások</item>
+        <item>Aktív témák</item>
         <item>Megválaszolatlan hsz.-ek</item>
         <item>Olvasatlan hsz.-ek</item>
         <item>Beállítások</item>

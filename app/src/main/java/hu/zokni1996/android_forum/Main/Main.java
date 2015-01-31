@@ -10,14 +10,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
@@ -46,6 +44,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.melnykov.fab.FloatingActionButton;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
@@ -57,7 +56,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -77,12 +75,14 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
     private ParseError parseError = new ParseError();
     private List<Items> itemsList = new ArrayList<>();
     private ProgressBar progressBarLoad;
+    private FloatingActionButton floatingActionButtonBACK;
+    private FloatingActionButton floatingActionButtonFORWARD;
     private boolean booleanClearHistory = true;
     private boolean booleanOnKeyDown = true;
     private String[] stringFailedLoadPage = new String[2];
     private String stringFailingURL = "";
-    private String mainUrl = "http://android-forum.hu";
-    private String newPostsUrl = "http://android-forum.hu/search.php?search_id=newposts";
+    private String mainUrl = "http://android-forum.hu/index.php?mobile=mobile";
+    private String newPostsUrl = "http://android-forum.hu/search.php?mobile=mobile&search_id=active_topics";
     private String id = "";
     private String titleWebView = "";
     private boolean booleanFailedLoadURL = false;
@@ -113,6 +113,30 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.SwipeContainer);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.Drawer);
         mDrawerList = (ListView) findViewById(android.R.id.list);
+        floatingActionButtonBACK = (FloatingActionButton) findViewById(R.id.WebViewBack);
+        floatingActionButtonFORWARD = (FloatingActionButton) findViewById(R.id.WebViewForward);
+        floatingActionButtonBACK.hide(false);
+        floatingActionButtonFORWARD.hide(false);
+        floatingActionButtonBACK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (webViewMain.canGoBack()) {
+                    progressBarLoad.setVisibility(View.VISIBLE);
+                    progressBarLoad.setProgress(0);
+                    webViewMain.goBack();
+                }
+            }
+        });
+        floatingActionButtonFORWARD.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (webViewMain.canGoForward()) {
+                    progressBarLoad.setVisibility(View.VISIBLE);
+                    progressBarLoad.setProgress(0);
+                    webViewMain.goForward();
+                }
+            }
+        });
         SetUpDrawer();
 
         ParseInstallation.getCurrentInstallation().saveInBackground();
@@ -180,17 +204,33 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                 return false;
             }
 
+
             @Override
             public void onPageFinished(WebView view, String url) {
                 progressBarLoad.setProgress(100);
                 progressBarLoad.setVisibility(View.GONE);
+
                 if (booleanClearHistory) {
                     booleanClearHistory = false;
                     webViewMain.clearHistory();
+                    if (!webViewMain.canGoBack())
+                        floatingActionButtonBACK.hide();
+                    else floatingActionButtonBACK.show();
+                    if (!webViewMain.canGoForward())
+                        floatingActionButtonFORWARD.hide();
+                    else floatingActionButtonFORWARD.show();
+                } else {
+                    if (!webViewMain.canGoBack())
+                        floatingActionButtonBACK.hide();
+                    else floatingActionButtonBACK.show();
+                    if (!webViewMain.canGoForward())
+                        floatingActionButtonFORWARD.hide();
+                    else floatingActionButtonFORWARD.show();
                 }
                 if (booleanReloadSwipe) {
                     booleanReloadSwipe = false;
                     swipeRefreshLayout.setRefreshing(false);
+
                 }
                 String stringTitle = webViewMain.getTitle();
                 try {
@@ -292,11 +332,11 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                     mDrawerLayout.closeDrawer(mDrawerList);
                 }
                 if (editedPosition == 4) {
-                    LoadURL("http://android-forum.hu/search.php?search_id=unanswered");
+                    LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unanswered");
                     mDrawerLayout.closeDrawer(mDrawerList);
                 }
                 if (editedPosition == 5) {
-                    LoadURL("http://android-forum.hu/search.php?search_id=unreadposts");
+                    LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unreadposts");
                     mDrawerLayout.closeDrawer(mDrawerList);
                 }
                 if (editedPosition == 6)
@@ -315,8 +355,14 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 super.onDrawerSlide(drawerView, slideOffset);
                 swipeRefreshLayout.setEnabled(false);
+                floatingActionButtonBACK.hide();
+                floatingActionButtonFORWARD.hide();
                 if (slideOffset == 0.0) {
                     swipeRefreshLayout.setEnabled(true);
+                    if (webViewMain.canGoForward())
+                        floatingActionButtonFORWARD.show();
+                    if (webViewMain.canGoBack())
+                        floatingActionButtonBACK.show();
                 }
             }
 

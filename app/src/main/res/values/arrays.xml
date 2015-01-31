@@ -60,7 +60,7 @@
     <string-array name="drawer_list">
         <item>Forum main page</item>
         <item>Favourites</item>
-        <item>New posts</item>
+        <item>Active topics</item>
         <item>Unanswered posts</item>
         <item>Unread posts</item>
         <item>Settings</item>
