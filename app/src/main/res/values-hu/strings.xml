@@ -151,4 +151,11 @@
     <string name="FailedLoadURL">Sikertelen betöltés</string>
     <string name="OnlyLast">Csak az utolsó</string>
     <string name="OnlyLastSummer">A legutolsó téma, amibe érkezett a hozzászólás jelenik meg</string>
+    <string name="application_version">Nem sikerült meghatározni az alkalmazás verziót</string>
+    <string name="ScreenSummarySettings">Az alkalmazással és a nézettel kapcsolatos beállítások</string>
+    <string name="NotificationSettingsSummary">Értesítések kérése, a szervertől, vagy az új hozzászólásokról</string>
+    <string name="NameRulesSummary">MINIG BE KELL TARTANI, OLVASD EL!</string>
+    <string name="AboutMeSummary">Alkalmazással kapcsolatos információk</string>
+    <string name="ExtrasSummary">Videó linkek, YouTube-ra. Android fejlesztéssel kapcsolatos oktató anyagok</string>
+    <string name="ParseSettingsNotificationNameSummary">Csak a moderátorok, és a rendszergazdák használhatják!</string>
 </resources>

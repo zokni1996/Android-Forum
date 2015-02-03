@@ -8,17 +8,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.SwitchPreference;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
@@ -53,8 +54,8 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
     static String changeLogEng = "";
     static String id = "";
     static ProgressDialog progressDialog;
-    private static ParseError parseError = new ParseError();
     static ActionBar actionBar;
+    private static ParseError parseError = new ParseError();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,8 +84,6 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
         for (Header header : target) {
             if (header.titleRes == R.string.AboutMe)
                 header.iconRes = R.drawable.ic_action_action_about_holo_light;
-            if (header.titleRes == R.string.WebViewScreen)
-                header.iconRes = R.drawable.ic_action_location_web_site_holo_light;
             if (header.titleRes == R.string.ScreenSettings)
                 header.iconRes = R.drawable.ic_action_hardware_phone_holo_light;
             if (header.titleRes == R.string.NotificationSettings)
@@ -222,6 +221,20 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
             addPreferencesFromResource(R.xml.settings_about);
 
             Preference myPref = findPreference("ChangeLog");
+            Preference preference = findPreference("BuildVersion");
+            PackageManager manager = getActivity().getPackageManager();
+            PackageInfo info = null;
+            try {
+                info = manager.getPackageInfo(
+                        getActivity().getPackageName(), 0);
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+            String version;
+            if (info != null) {
+                version = info.versionName;
+            } else version = getString(R.string.application_version);
+            preference.setSummary(version);
             myPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
@@ -279,18 +292,6 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
         }
     }
 
-    public static class FragmentSettingsWebViewScreen extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            if (actionBar != null)
-                actionBar.setIcon(R.drawable.ic_action_location_web_site_holo_light);
-
-            addPreferencesFromResource(R.xml.settings_webviewscreen);
-        }
-
-    }
-
     public static class FragmentSettingsScreen extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -335,7 +336,7 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
                 progressDialog.dismiss();
             }
             if (ParseUser.getCurrentUser() != null) {
-                SwitchPreference pushPreferenceM = (SwitchPreference) findPreference("NotificationParseMaintenance");
+                CheckBoxPreference pushPreferenceM = (CheckBoxPreference) findPreference("NotificationParseMaintenance");
                 pushPreferenceM.setOnPreferenceChangeListener(this);
             }
         }

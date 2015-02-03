@@ -496,7 +496,6 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
         dialog.show();
     }
 
-
     @Override
     public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
@@ -524,7 +523,7 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                                 dialog.cancel();
                             }
                         }).show();
-            }
+            } else finish();
         }
         return true;
     }
@@ -619,15 +618,6 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                     break;
             }
         }
-        if (key.equals("ZoomButton")) {
-            SharedPreferences ZoomButtonPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            boolean ZoomButton = ZoomButtonPref.getBoolean("ZoomButton", false);
-            if (!ZoomButton) {
-                Toast.makeText(this, getString(R.string.ToastRestartTheApplication), Toast.LENGTH_SHORT).show();
-                webViewMain.getSettings().setDisplayZoomControls(false);
-            } else
-                webViewMain.getSettings().setDisplayZoomControls(true);
-        }
         if (key.equals("Zoom")) {
             SharedPreferences ZoomPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
             boolean Zoom = ZoomPref.getBoolean("Zoom", false);
@@ -707,18 +697,13 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
         webViewMain.requestFocusFromTouch();
         webViewMain.getSettings().setJavaScriptEnabled(true);
         webViewMain.setFitsSystemWindows(true);
+        webViewMain.getSettings().setDisplayZoomControls(false);
         SharedPreferences ZoomPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         boolean Zoom = ZoomPref.getBoolean("Zoom", false);
         if (Zoom)
             webViewMain.getSettings().setBuiltInZoomControls(true);
         else
             webViewMain.getSettings().setBuiltInZoomControls(false);
-        SharedPreferences ZoomButtonPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean ZoomButton = ZoomButtonPref.getBoolean("ZoomButton", false);
-        if (!ZoomButton)
-            webViewMain.getSettings().setDisplayZoomControls(false);
-        else
-            webViewMain.getSettings().setDisplayZoomControls(true);
         SharedPreferences BasicZoomPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         int BasicZoom = Integer.parseInt(BasicZoomPref.getString("BasicZoom", "100"));
         switch (BasicZoom) {

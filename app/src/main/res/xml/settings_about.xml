@@ -13,22 +13,23 @@
     <PreferenceCategory android:title="@string/Support">
         <Preference android:layout="@layout/settings_support" />
         <Preference
-            android:title="@string/ChangeLog"
-            android:key="ChangeLog" />
+            android:key="ChangeLog"
+            android:title="@string/ChangeLog" />
 
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/Other">
         <Preference
-            android:title="@string/OpenInBrowser"
-            android:summary="@string/OpenInBrowserSummary">
+            android:summary="@string/OpenInBrowserSummary"
+            android:title="@string/OpenInBrowser">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="http://android-forum.hu/" />
         </Preference>
         <Preference
-            android:title="@string/Version"
-            android:summary="@string/VersionSummary" />
+            android:key="BuildVersion"
+            android:summary="@string/VersionSummary"
+            android:title="@string/Version" />
     </PreferenceCategory>
 
 </PreferenceScreen>

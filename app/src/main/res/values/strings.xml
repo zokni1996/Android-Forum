@@ -152,4 +152,11 @@
     <string name="OnlyLast">Only the last</string>
     <string name="OnlyLastSummer">Show the last topic, from the new posts</string>
 
+    <string name="application_version">Failed to get application version</string>
+    <string name="ScreenSummarySettings">Application, and the WebView settings</string>
+    <string name="NotificationSettingsSummary">Get notification from the server, and from the new posts</string>
+    <string name="NameRulesSummary">ALWAYS KEEP IT!</string>
+    <string name="AboutMeSummary">Information from the app, and from the developer(s)</string>
+    <string name="ExtrasSummary">Links to the YouTube. There are a lot of videos to study develop for Android</string>
+    <string name="ParseSettingsNotificationNameSummary">Only moderators and administrators can use!</string>
 </resources>

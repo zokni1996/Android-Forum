@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Theme Splash -->
+    <style name="Theme.Base" parent="android:Theme.Holo.Light.NoActionBar" />
+
+    <!-- Theme Settings -->
+    <style name="StyleThemeSettings" parent="android:Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/actionBarStyled</item>
+        <item name="android:checkboxStyle">@style/CheckBoxAppTheme</item>
+        <item name="android:radioButtonStyle">@style/RadioButtonAppTheme</item>
+    </style>
+
+    <style name="actionBarStyled" parent="android:Widget.ActionBar">
+        <item name="android:actionBarSize">?attr/actionBarSize</item>
+        <item name="android:background">@color/color_green</item>
+    </style>
+
+    <style name="CheckBoxAppTheme" parent="android:Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/btn_check_holo_light</item>
+    </style>
+
+    <style name="RadioButtonAppTheme" parent="android:style/Widget.Button.Toggle">
+        <item name="android:button">@drawable/btn_radio_holo_light</item>
+    </style>
+
+
+    <!--Theme Drawer -->
+    <style name="AppTheme.Base" parent="Theme.AppCompat.Light">
+        <item name="colorPrimary">@color/color_green</item>
+        <item name="colorPrimaryDark">@color/pressed_styled</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
+
+    <style name="StyleThemeDrawer" parent="AppTheme.Base" />
+
+    <style name="ToolbarTheme" parent="Theme.AppCompat">
+        <item name="android:textColorPrimary">@color/abc_primary_text_material_light</item>
+        <item name="actionMenuTextColor">@color/abc_primary_text_material_light</item>
+        <item name="android:textColorSecondary">@color/abc_secondary_text_material_light</item>
+    </style>
+
+
+    <!-- Button Rounded -->
+    <style name="ButtonStyleRounded" parent="android:style/Widget.Button">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/btn_rounded_bg</item>
+        <item name="android:padding">0dp</item>
+    </style>
+</resources>
