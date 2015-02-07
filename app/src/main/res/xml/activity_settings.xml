@@ -3,27 +3,21 @@
 
     <header
         android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsScreen"
-        android:summary="@string/ScreenSummarySettings"
         android:title="@string/ScreenSettings" />
     <header
         android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsNotification"
-        android:summary="@string/NotificationSettingsSummary"
         android:title="@string/NotificationSettings" />
     <header
         android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsRules"
-        android:summary="@string/NameRulesSummary"
         android:title="@string/NameRules" />
     <header
         android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsAbout"
-        android:summary="@string/AboutMeSummary"
         android:title="@string/AboutMe" />
     <header
         android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsExtra"
-        android:summary="@string/ExtrasSummary"
         android:title="@string/Extras" />
     <header
         android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsDeveloper"
-        android:summary="@string/ParseSettingsNotificationNameSummary"
         android:title="@string/ParseSettingsNotificationName" />
 
 </preference-headers>

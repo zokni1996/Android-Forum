@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Theme Progress Bar -->
+    <style name="ProgressBarTheme" parent="android:Widget.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">
+            @drawable/progress_horizontal_holo_no_background_light
+        </item>
+        <item name="android:minHeight">16dip</item>
+        <item name="android:maxHeight">16dip</item>
+    </style>
+
     <!-- Theme Splash -->
     <style name="Theme.Base" parent="android:Theme.Holo.Light.NoActionBar" />
 

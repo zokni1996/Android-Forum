@@ -67,13 +67,13 @@
 
             <ProgressBar
                 android:id="@+id/ProgressBar"
-                style="?android:attr/progressBarStyleHorizontal"
+                style="@style/ProgressBarTheme"
                 android:layout_width="fill_parent"
                 android:layout_height="20dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:background="@color/gradient_start" />
+                android:background="@color/color_green" />
         </RelativeLayout>
 
         <ListView

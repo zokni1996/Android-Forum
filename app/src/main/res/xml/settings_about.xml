@@ -28,7 +28,7 @@
         </Preference>
         <Preference
             android:key="BuildVersion"
-            android:summary="@string/VersionSummary"
+            android:summary="@string/application_version"
             android:title="@string/Version" />
     </PreferenceCategory>
 

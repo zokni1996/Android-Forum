@@ -18,19 +18,37 @@ package hu.zokni1996.android_forum.Main;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Point;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Display;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import hu.zokni1996.android_forum.R;
 
 public class Splash extends Activity {
+    private boolean booleanLoadNewPost = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
-
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+        int height = size.y;
+        ImageView imageView = (ImageView) findViewById(R.id.imageViewSPLASH);
+        TextView textView = (TextView) findViewById(R.id.textViewSPLASH);
+        textView.setTypeface(textView.getTypeface(), Typeface.BOLD);
+        if (width >= 1080 && height >= 1920)
+            imageView.setImageResource(R.drawable.logo_500);
+        else imageView.setImageResource(R.drawable.logo_250);
+        Bundle extras = getIntent().getExtras();
+        if (extras != null)
+            booleanLoadNewPost = extras.getBoolean("nameID");
         new Handler().postDelayed(new Runnable() {
 
             /*
@@ -40,14 +58,13 @@ public class Splash extends Activity {
 
             @Override
             public void run() {
-                // This method will be executed once the timer is over
-                // Start your app main activity
                 Intent i = new Intent(Splash.this, Main.class);
-
+                if (booleanLoadNewPost)
+                    i.putExtra("nameID", true);
                 startActivity(i);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                // close this activity
                 finish();
+
             }
         }, 1000);
     }

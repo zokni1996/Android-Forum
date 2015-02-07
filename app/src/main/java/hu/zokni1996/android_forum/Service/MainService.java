@@ -14,38 +14,23 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
-import org.xmlpull.v1.XmlPullParserException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.List;
 
-import hu.zokni1996.android_forum.Main.Main;
+import hu.zokni1996.android_forum.Main.Splash;
 import hu.zokni1996.android_forum.Parse.ParseError;
 import hu.zokni1996.android_forum.R;
 
 public class MainService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener {
-    private String checkNowLastPostTimeString = "";
-    private String lastUpdatedString = "";
-    private String savedUpdatedString = "";
-    private String contentString = "";
-    private String titleString = "";
-    private String updatedString = "";
-    private String contentArray[];
-    private String titleArray[];
-    private String updatedArray[];
+
     private String id = "";
     private boolean enabledBoolean = true;
-    private boolean wifiConnectedBoolean = false;
-    private boolean mobileConnectedBoolean = false;
     private boolean lastPostShow = false;
     private int timeCheck = 300000;
     private int NotificationPriorityInt;
-    private int NotificationSoundInt;
-    private int NotificationLedInt;
-    private int NotificationVibrateInt;
     private int NotificationStyleInt;
     private NotificationCompat.InboxStyle inboxStyle;
     private ParseError parseError = new ParseError();
@@ -58,8 +43,7 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         enabledBoolean = true;
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
         getSettings();
         id = android.provider.Settings.Secure.getString(getApplicationContext().getContentResolver(),
@@ -78,8 +62,7 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals("NotificationStyle")) {
-            SharedPreferences NotificationStylePref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            int NotificationStyle = Integer.parseInt(NotificationStylePref.getString("NotificationStyle", "4"));
+            int NotificationStyle = Integer.parseInt(sharedPreferences.getString(key, "4"));
             switch (NotificationStyle) {
                 case 1:
                     NotificationStyleInt = 1;
@@ -96,8 +79,7 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
             }
         }
         if (key.equals("NotificationTimeCheck")) {
-            SharedPreferences NotificationTimeCheckPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            int NotificationTimeCheck = Integer.parseInt(NotificationTimeCheckPref.getString("NotificationTimeCheck", "1"));
+            int NotificationTimeCheck = Integer.parseInt(sharedPreferences.getString(key, "1"));
             switch (NotificationTimeCheck) {
                 case 1:
                     timeCheck = 300000;
@@ -117,8 +99,7 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
             }
         }
         if (key.equals("NotificationPriority")) {
-            SharedPreferences NotificationPriorityPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            int NotificationPriority = Integer.parseInt(NotificationPriorityPref.getString("NotificationPriority", "1"));
+            int NotificationPriority = Integer.parseInt(sharedPreferences.getString(key, "1"));
             switch (NotificationPriority) {
                 case 1:
                     NotificationPriorityInt = Notification.PRIORITY_DEFAULT;
@@ -137,119 +118,63 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
                     break;
             }
         }
-        if (key.equals("Sound")) {
-            SharedPreferences NotificationSoundPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            boolean NotificationSound = NotificationSoundPref.getBoolean("Sound", false);
-            if (NotificationSound)
-                NotificationSoundInt = Notification.DEFAULT_SOUND;
-            else
-                NotificationSoundInt = 0;
-        }
-        if (key.equals("Led")) {
-            SharedPreferences NotificationLedPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            boolean NotificationLed = NotificationLedPref.getBoolean("Led", false);
-            if (NotificationLed)
-                NotificationLedInt = Notification.DEFAULT_LIGHTS;
-            else
-                NotificationLedInt = -999;
-        }
-        if (key.equals("Vibrate")) {
-            SharedPreferences NotificationVibratePref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            boolean NotificationVibrate = NotificationVibratePref.getBoolean("Vibrate", false);
-            if (!NotificationVibrate)
-                NotificationVibrateInt = Notification.DEFAULT_VIBRATE;
-            else
-                NotificationVibrateInt = -999;
-        }
-        if (key.equals("LastPostNotification")) {
-            SharedPreferences NotificationLastPostPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            boolean NotificationLastPost = NotificationLastPostPref.getBoolean("LastPostNotification", false);
-            if (!NotificationLastPost)
-                lastPostShow = false;
-            else lastPostShow = true;
-        }
     }
 
-    private void updateConnectedFlags() {
-        ConnectivityManager connMgr =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo activeInfo = connMgr.getActiveNetworkInfo();
-        if (activeInfo != null && activeInfo.isConnected()) {
-            wifiConnectedBoolean = activeInfo.getType() == ConnectivityManager.TYPE_WIFI;
-            mobileConnectedBoolean = activeInfo.getType() == ConnectivityManager.TYPE_MOBILE;
-        } else {
-            wifiConnectedBoolean = false;
-            mobileConnectedBoolean = false;
-        }
+    private boolean updateConnectedFlags() {
+        /* Check the device whatever connected to network */
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        NetworkInfo mMobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        boolean connectedMobile = mMobile.isConnected();
+        boolean connectedWifi = mWifi.isConnected();
+        return connectedMobile || connectedWifi;
     }
 
-    private String loadXmlFromNetwork(String urlString) throws XmlPullParserException, IOException {
-        InputStream stream = null;
-        AndroidForumParser stackAndroidForumParser = new AndroidForumParser();
-        List<AndroidForumParser.Entry> entries = null;
-
-        try {
-            stream = downloadUrl(urlString);
-            entries = stackAndroidForumParser.parse(stream);
-        } finally {
-            if (stream != null) {
-                stream.close();
-            }
-        }
-        for (AndroidForumParser.Entry entry : entries) {
-            titleString += "• ";
-            titleString += entry.title;
-            titleString += "ThisIsTheSplit";
-            checkNowLastPostTimeString += entry.updated;
-            checkNowLastPostTimeString += " ";
-            contentString += entry.content;
-            contentString += "ThisIsTheSplit";
-        }
-        return "";
-    }
-
-    private InputStream downloadUrl(String urlString) throws IOException {
-        URL url = new URL(urlString);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setReadTimeout(10000);
-        conn.setConnectTimeout(15000);
-        conn.setRequestMethod("GET");
-        conn.setDoInput(true);
-        conn.connect();
-        return conn.getInputStream();
-    }
-
-    private void NotificationMethod(int NotificationVibrateInt, int NotificationSoundInt, int NotificationLedInt, int NotificationPriorityInt) {
+    private void NotificationMethod(int NotificationPriorityInt, String content, String title) {
         getSettings();
-        Intent intent = new Intent(getApplicationContext(), Main.class);
+        Intent intent = new Intent(getApplicationContext(), Splash.class);
         intent.putExtra("nameID", true);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(MainService.this)
-
                 .setSmallIcon(R.drawable.ic_stat_af)
                 .setContentTitle(getString(R.string.NotificationContentTitle))
                 .setAutoCancel(true)
                 .setContentText(getString(R.string.NotificationContentText))
-                .setDefaults(NotificationVibrateInt | NotificationSoundInt | NotificationLedInt)
+                .setDefaults(Notification.DEFAULT_ALL)
                 .setPriority(NotificationPriorityInt)
                 .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0));
         inboxStyle = new NotificationCompat.InboxStyle();
         inboxStyle.setBigContentTitle(getString(R.string.TheLatestPostsTitle));
-        updatedString = " •";
-        contentArray = contentString.split("ThisIsTheSplit");
-        getString();
-        titleArray = titleString.split("ThisIsTheSplit");
-        updatedArray = updatedString.split("ThisIsTheSplit");
+
+        String[] contentArray = content.split("THIS_IS_THE_SPLIT");
+        String updatedString = getString(contentArray);
+        String[] titleArray = title.split("THIS_IS_THE_SPLIT");
+        String[] updatedArray = updatedString.split("THIS_IS_THE_SPLIT");
 
         if (NotificationStyleInt == 1)
-            NotificationStyleInt1();
+            try {
+                NotificationStyleInt1(titleArray, updatedArray);
+            } catch (NullPointerException e) {
+                parseError.sendError("MainService.class", "NotificationStyleInt 1", "" + e, id);
+            }
         if (NotificationStyleInt == 2)
-            NotificationStyleInt2();
+            try {
+                NotificationStyleInt2(titleArray, updatedArray);
+            } catch (NullPointerException e) {
+                parseError.sendError("MainService.class", "NotificationStyleInt 2", "" + e, id);
+            }
         if (NotificationStyleInt == 3)
-            NotificationStyleInt3();
+            try {
+                NotificationStyleInt3(titleArray);
+            } catch (NullPointerException e) {
+                parseError.sendError("MainService.class", "NotificationStyleInt 3", "" + e, id);
+            }
         if (NotificationStyleInt == 4)
-            NotificationStyleInt4();
+            try {
+                NotificationStyleInt4(titleArray, updatedArray);
+            } catch (NullPointerException e) {
+                parseError.sendError("MainService.class", "NotificationStyleInt 4", "" + e, id);
+            }
         mBuilder.setStyle(inboxStyle);
         mBuilder.build();
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -257,15 +182,13 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
         mBuilder.setStyle(inboxStyle);
         Notification notification = mBuilder.build();
         notificationManager.notify(notificationId, notification);
-        getSharedPreferences("LAST_UPDATED", MODE_PRIVATE)
-                .edit()
-                .putString("LastUpdated", lastUpdatedString)
-                .commit();
-        setStringNull();
+
     }
 
-    private void getString() {
-        for (String aContentArray : contentArray) {
+    private String getString(String[] CONTENT_ARRAY_TO_UPDATED_TIME) {
+        /* Get the time from the content, that we will compare the saved time */
+        String updatedString = " •";
+        for (String aContentArray : CONTENT_ARRAY_TO_UPDATED_TIME) {
             boolean you = true;
             int j = 0;
             while (you) {
@@ -281,7 +204,7 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
                                             updatedString += aContentArray.charAt(a);
                                             a++;
                                             if (aContentArray.charAt(a) == '<') {
-                                                updatedString += "ThisIsTheSplit •";
+                                                updatedString += "THIS_IS_THE_SPLIT •";
                                                 there = false;
                                                 you = false;
                                             }
@@ -290,45 +213,12 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
                 j++;
             }
         }
-    }
-
-    private void setStringNull() {
-        lastUpdatedString = "";
-        savedUpdatedString = "";
-        contentString = "";
-        titleString = "";
-        updatedString = "";
-        try {
-            if (contentArray != null)
-                for (int i = 0; i < contentArray.length; i++)
-                    contentArray[i] = "";
-        } catch (Exception e) {
-            parseError.sendError("MainService.class", "Set NULL contentArray", "" + e, id);
-        }
-        try {
-            if (titleArray != null)
-                for (int i = 0; i < titleArray.length; i++)
-                    titleArray[i] = "";
-        } catch (Exception e) {
-            parseError.sendError("MainService.class", "Set NULL titleArray", "" + e, id);
-        }
-        try {
-            if (updatedArray != null)
-                for (int i = 0; i < updatedArray.length; i++)
-                    updatedArray[i] = "";
-        } catch (Exception e) {
-            parseError.sendError("MainService.class", "Set NULL updatedArray", "" + e, id);
-        }
-        try {
-            inboxStyle = null;
-        } catch (Exception e) {
-            parseError.sendError("MainService.class", "Set NULL inboxStyle", "" + e, id);
-        }
+        return updatedString;
     }
 
     private void getSettings() {
-        SharedPreferences NotificationStylePref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        int NotificationStyle = Integer.parseInt(NotificationStylePref.getString("NotificationStyle", "4"));
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        int NotificationStyle = Integer.parseInt(sharedPreferences.getString("NotificationStyle", "4"));
         switch (NotificationStyle) {
             case 1:
                 NotificationStyleInt = 1;
@@ -343,8 +233,7 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
                 NotificationStyleInt = 4;
                 break;
         }
-        SharedPreferences NotificationTimeCheckPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        int NotificationTimeCheck = Integer.parseInt(NotificationTimeCheckPref.getString("NotificationTimeCheck", "1"));
+        int NotificationTimeCheck = Integer.parseInt(sharedPreferences.getString("NotificationTimeCheck", "1"));
         switch (NotificationTimeCheck) {
             case 1:
                 timeCheck = 300000;
@@ -362,8 +251,7 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
                 timeCheck = 7200000;
                 break;
         }
-        SharedPreferences NotificationPriorityPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        int NotificationPriority = Integer.parseInt(NotificationPriorityPref.getString("NotificationPriority", "1"));
+        int NotificationPriority = Integer.parseInt(sharedPreferences.getString("NotificationPriority", "1"));
         switch (NotificationPriority) {
             case 1:
                 NotificationPriorityInt = Notification.PRIORITY_DEFAULT;
@@ -381,166 +269,121 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
                 NotificationPriorityInt = Notification.PRIORITY_MAX;
                 break;
         }
-        SharedPreferences NotificationSoundPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean NotificationSound = NotificationSoundPref.getBoolean("Sound", false);
-        if (NotificationSound)
-            NotificationSoundInt = Notification.DEFAULT_SOUND;
-        else
-            NotificationSoundInt = 0;
-
-        SharedPreferences NotificationLedPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean NotificationLed = NotificationLedPref.getBoolean("Led", false);
-        if (NotificationLed)
-            NotificationLedInt = Notification.DEFAULT_LIGHTS;
-        else
-            NotificationLedInt = -999;
-
-        SharedPreferences NotificationVibratePref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean NotificationVibrate = NotificationVibratePref.getBoolean("Vibrate", false);
-        if (NotificationVibrate)
-            NotificationVibrateInt = Notification.DEFAULT_VIBRATE;
-        else
-            NotificationVibrateInt = -999;
-        SharedPreferences NotificationPostPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean NotificationPost = NotificationPostPref.getBoolean("LastPostNotification", false);
-        if (NotificationPost)
-            lastPostShow = true;
-        else
-            lastPostShow = false;
     }
 
-    private void NotificationStyleInt1() {
-        try {
-            String topicNameString = "• ";
-            for (String aNewPostsArray : titleArray) {
-                boolean you = true;
-                int j = 0;
-                while (you) {
-                    if (aNewPostsArray.charAt(j) == '•') {
-                        boolean there = true;
-                        int a = j + 1;
-                        while (there) {
-                            topicNameString += aNewPostsArray.charAt(a);
-                            a++;
-                            if (a == aNewPostsArray.length()) {
-                                you = false;
-                                break;
-                            }
-                            if (aNewPostsArray.charAt(a) == '•') {
-                                topicNameString += "ThisIsTheSplit•";
-                                there = false;
-                                you = false;
-                            }
+    private void NotificationStyleInt1(String[] titleArray, String[] updatedArray) throws NullPointerException {
+        String topicNameString = "• ";
+        for (String aNewPostsArray : titleArray) {
+            boolean you = true;
+            int j = 0;
+            while (you) {
+                if (aNewPostsArray.charAt(j) == '•') {
+                    boolean there = true;
+                    int a = j + 1;
+                    while (there) {
+                        topicNameString += aNewPostsArray.charAt(a);
+                        a++;
+                        if (a == aNewPostsArray.length()) {
+                            you = false;
+                            break;
+                        }
+                        if (aNewPostsArray.charAt(a) == '•') {
+                            topicNameString += "THIS_IS_THE_SPLIT•";
+                            there = false;
+                            you = false;
                         }
                     }
-                    j++;
                 }
+                j++;
             }
-            String[] topicArray = topicNameString.split("ThisIsTheSplit");
-            if (!lastPostShow)
-                for (int i = 0; i < topicArray.length; i++) {
-                    topicArray[i] += updatedArray[i];
-                    inboxStyle.addLine(topicArray[i]);
-                }
-            else {
-                topicArray[0] += updatedArray[0];
-                inboxStyle.addLine(topicArray[0]);
-            }
-            for (int i = 0; i < topicArray.length; i++)
-                topicArray[i] = "";
-        } catch (Exception e) {
-            parseError.sendError("MainService.class", "NotificationStyleInt 1", "" + e, id);
         }
+        String[] topicArray = topicNameString.split("THIS_IS_THE_SPLIT");
+        if (!lastPostShow)
+            for (int i = 0; i < topicArray.length; i++) {
+                topicArray[i] += updatedArray[i];
+                inboxStyle.addLine(topicArray[i]);
+            }
+        else {
+            topicArray[0] += updatedArray[0];
+            inboxStyle.addLine(topicArray[0]);
+        }
+        for (int i = 0; i < topicArray.length; i++)
+            topicArray[i] = "";
     }
 
-    private void NotificationStyleInt2() {
-        try {
-            String forumString = "•";
-            for (String aNewPostsArray : titleArray) {
-                boolean you = true;
-                int j = 0;
-                while (you) {
-                    if (aNewPostsArray.charAt(j) == '•') {
-                        boolean you2 = true;
-                        int k = j;
-                        k++;
-                        while (you2) {
-                            if (aNewPostsArray.charAt(k) == '•') {
-                                int a = k + 1;
-                                while (true) {
-                                    forumString += aNewPostsArray.charAt(a);
-                                    a++;
-                                    if (a == aNewPostsArray.length()) {
-                                        you = false;
-                                        you2 = false;
-                                        forumString += "ThisIsTheSplit•";
-                                        break;
-                                    }
+    private void NotificationStyleInt2(String[] titleArray, String[] updatedArray) throws NullPointerException {
+        String forumString = "•";
+        for (String aNewPostsArray : titleArray) {
+            boolean you = true;
+            int j = 0;
+            while (you) {
+                if (aNewPostsArray.charAt(j) == '•') {
+                    boolean you2 = true;
+                    int k = j;
+                    k++;
+                    while (you2) {
+                        if (aNewPostsArray.charAt(k) == '•') {
+                            int a = k + 1;
+                            while (true) {
+                                forumString += aNewPostsArray.charAt(a);
+                                a++;
+                                if (a == aNewPostsArray.length()) {
+                                    you = false;
+                                    you2 = false;
+                                    forumString += "THIS_IS_THE_SPLIT•";
+                                    break;
                                 }
                             }
-                            k++;
-                            if (k == aNewPostsArray.length()) {
-                                you = false;
-                                break;
-                            }
+                        }
+                        k++;
+                        if (k == aNewPostsArray.length()) {
+                            you = false;
+                            break;
                         }
                     }
-                    j++;
                 }
+                j++;
             }
-            String[] forumArray = forumString.split("ThisIsTheSplit");
-            if (!lastPostShow)
-                for (int i = 0; i < forumArray.length; i++) {
-                    forumArray[i] += updatedArray[i];
-                    inboxStyle.addLine(forumArray[i]);
-                }
-            else {
-                forumArray[0] += updatedArray[0];
-                inboxStyle.addLine(forumArray[0]);
-            }
-            for (int i = 0; i < forumArray.length; i++)
-                forumArray[i] = "";
-        } catch (Exception e) {
-            parseError.sendError("MainService.class", "NotificationStyleInt 2", "" + e, id);
         }
+        String[] forumArray = forumString.split("THIS_IS_THE_SPLIT");
+        if (!lastPostShow)
+            for (int i = 0; i < forumArray.length; i++) {
+                forumArray[i] += updatedArray[i];
+                inboxStyle.addLine(forumArray[i]);
+            }
+        else {
+            forumArray[0] += updatedArray[0];
+            inboxStyle.addLine(forumArray[0]);
+        }
+        for (int i = 0; i < forumArray.length; i++)
+            forumArray[i] = "";
     }
 
-    private void NotificationStyleInt3() {
-        try {
-            if (!lastPostShow)
-                for (String aNewPostsArray : titleArray) inboxStyle.addLine(aNewPostsArray);
-            else inboxStyle.addLine(titleArray[0]);
-        } catch (Exception e) {
-            parseError.sendError("MainService.class", "NotificationStyleInt 3", "" + e, id);
-        }
+    private void NotificationStyleInt3(String[] titleArray) throws NullPointerException {
+        if (!lastPostShow)
+            for (String aNewPostsArray : titleArray) inboxStyle.addLine(aNewPostsArray);
+        else inboxStyle.addLine(titleArray[0]);
     }
 
-    private void NotificationStyleInt4() {
-        try {
-            if (!lastPostShow)
-                for (int i = 0; i < titleArray.length; i++) {
-                    titleArray[i] += updatedArray[i];
-                    inboxStyle.addLine(titleArray[i]);
-                }
-            else {
-                titleArray[0] += updatedArray[0];
-                inboxStyle.addLine(titleArray[0]);
+    private void NotificationStyleInt4(String[] titleArray, String[] updatedArray) throws NullPointerException {
+        if (!lastPostShow)
+            for (int i = 0; i < titleArray.length; i++) {
+                titleArray[i] += updatedArray[i];
+                inboxStyle.addLine(titleArray[i]);
             }
-        } catch (Exception e) {
-            parseError.sendError("MainService.class", "NotificationStyleInt 4", "" + e, id);
+        else {
+            titleArray[0] += updatedArray[0];
+            inboxStyle.addLine(titleArray[0]);
         }
-
     }
 
     private class MySync extends Thread {
         public void run() {
             while (enabledBoolean) {
-                updateConnectedFlags();
                 getSettings();
-                if (wifiConnectedBoolean || mobileConnectedBoolean) {
+                if (updateConnectedFlags()) {
                     getSettings();
-                    savedUpdatedString = getSharedPreferences("LAST_UPDATED", MODE_PRIVATE).getString("LastUpdated", "");
-                    new DownloadXmlTask().execute("http://android-forum.hu/feed.php");
+                    new DownloadXmlTask().execute("http://android-forum.hu/feed.php?mobile=mobile");
                     try {
                         sleep(timeCheck);
                     } catch (InterruptedException e) {
@@ -558,37 +401,63 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
         }
     }
 
-    private class DownloadXmlTask extends AsyncTask<String, Void, String> {
-
+    private class DownloadXmlTask extends AsyncTask<String, Void, Void> {
+        String stringUPDATED = "";
+        String contentSTRING = "";
+        String titleSTRING = "";
 
         @Override
-        protected String doInBackground(String... urls) {
+        protected Void doInBackground(String... urls) {
             try {
-                return loadXmlFromNetwork(urls[0]);
+                Document document = Jsoup.connect("http://android-forum.hu/feed.php").timeout(10000).get();
+                Elements updated = document.select("updated");
+                Elements entry = document.select("entry");
+
+                for (int i = 0; i < entry.size(); i++) {
+                    /* Get all the titles */
+                    Elements title = entry.get(i).select("title");
+                    for (int j = 0; j < title.size(); j++) {
+                        Elements titleAttr = title.get(j).getElementsByAttributeValueContaining("type", "html");
+                        for (int l = 0; l < titleAttr.size(); l++) {
+                            titleSTRING += "• ";
+                            titleSTRING += titleAttr.get(l).text().replace("<![CDATA[", "").replace("]]>", "");
+                            titleSTRING += "THIS_IS_THE_SPLIT";
+                        }
+                    }
+                    /* Get all the contents*/
+                    Elements content = entry.get(i).select("content");
+                    for (int j = 0; j < content.size(); j++) {
+                        contentSTRING += content.get(j).text().replace("<![CDATA[", "]]>").replace("]]>", "");
+                        contentSTRING += "THIS_IS_THE_SPLIT";
+                    }
+                }
+                /* Get the latest post time */
+                stringUPDATED = updated.get(0).text();
             } catch (IOException e) {
-                return "" + e;
-            } catch (XmlPullParserException e) {
-                return "" + e;
+                parseError.sendError("MainService.java", "DOWNLOAD_FEED", "" + e, id);
             }
+            return null;
         }
 
+
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
             getSettings();
-            try {
-                if (checkNowLastPostTimeString.length() > 50)
-                    if (checkNowLastPostTimeString.charAt(51) == ' ')
-                        lastUpdatedString = checkNowLastPostTimeString.substring(25, 51);
-            } catch (Exception e) {
-                parseError.sendError("MainService.class", "Can\'t check the update", "" + e, id);
+            /* Get the saved time */
+            String stringSAVED = getSharedPreferences("LAST_UPDATED", MODE_PRIVATE).getString("LastUpdated", "");
+            /*  If the data got successfully, save the time */
+            if (stringUPDATED.length() > 0 && !stringUPDATED.equals(stringSAVED) && contentSTRING.length() > 0 && titleSTRING.length() > 0) {
+                getSharedPreferences("LAST_UPDATED", MODE_PRIVATE)
+                        .edit()
+                        .putString("LastUpdated", stringUPDATED)
+                        .commit();
+                /* If the saved time > 0, then make the notification */
+                if (stringSAVED.length() > 0)
+                    NotificationMethod(NotificationPriorityInt, contentSTRING, titleSTRING);
+
             }
-            try {
-                if (!lastUpdatedString.equals(savedUpdatedString))
-                    NotificationMethod(NotificationVibrateInt, NotificationSoundInt, NotificationLedInt, NotificationPriorityInt);
-            } catch (Exception e) {
-                parseError.sendError("MainService.class", "Can\'t check the update", "" + e, id);
-            }
-            checkNowLastPostTimeString = "";
         }
     }
+
 }

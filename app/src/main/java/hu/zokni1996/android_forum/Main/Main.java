@@ -107,6 +107,7 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
         IsItFirstRun();
         id = android.provider.Settings.Secure.getString(getApplicationContext().getContentResolver(),
                 android.provider.Settings.Secure.ANDROID_ID);
+
         webViewMain = (WebView) findViewById(R.id.WebViewMain);
         progressBarLoad = (ProgressBar) findViewById(R.id.ProgressBar);
         toolbar = (Toolbar) findViewById(R.id.Toolbar);
@@ -115,42 +116,18 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
         mDrawerList = (ListView) findViewById(android.R.id.list);
         floatingActionButtonBACK = (FloatingActionButton) findViewById(R.id.WebViewBack);
         floatingActionButtonFORWARD = (FloatingActionButton) findViewById(R.id.WebViewForward);
-        floatingActionButtonBACK.hide(false);
-        floatingActionButtonFORWARD.hide(false);
-        floatingActionButtonBACK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (webViewMain.canGoBack()) {
-                    progressBarLoad.setVisibility(View.VISIBLE);
-                    progressBarLoad.setProgress(0);
-                    webViewMain.goBack();
-                }
-            }
-        });
-        floatingActionButtonFORWARD.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (webViewMain.canGoForward()) {
-                    progressBarLoad.setVisibility(View.VISIBLE);
-                    progressBarLoad.setProgress(0);
-                    webViewMain.goForward();
-                }
-            }
-        });
-        SetUpDrawer();
 
-        ParseInstallation.getCurrentInstallation().saveInBackground();
-        ParseAnalytics.trackAppOpenedInBackground(getIntent());
-        Parse.setLogLevel(Parse.LOG_LEVEL_INFO);
+        FloatingActionButtonSETUP();
+        DrawerSETUP();
 
-        String ns = Context.NOTIFICATION_SERVICE;
         Bundle extras = getIntent().getExtras();
         if (extras != null)
             booleanLoadNewPost = extras.getBoolean("nameID");
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancelAll();
-        SettingsWebView();
-        SettingScreen();
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
+        getSettings(PreferenceManager.getDefaultSharedPreferences(this));
+
         webViewMain.setWebViewClient(new WebViewClient() {
 
             @Override
@@ -172,7 +149,7 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                         booleanFailedLoadURL = true;
                         input.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        parseError.sendError("Main.java", "OnReceivedError", "" + e, id);
                     }
                     view.loadDataWithBaseURL(null, stringFailedLoadPage[0], "text/html; charset=utf-8", "UTF-8",
                             null);
@@ -209,7 +186,6 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
             public void onPageFinished(WebView view, String url) {
                 progressBarLoad.setProgress(100);
                 progressBarLoad.setVisibility(View.GONE);
-
                 if (booleanClearHistory) {
                     booleanClearHistory = false;
                     webViewMain.clearHistory();
@@ -269,36 +245,40 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
         });
 
         if (savedInstanceState == null)
-            if (!booleanLoadNewPost) {
+            if (!booleanLoadNewPost)
                 LoadURL(mainUrl);
-            } else {
+            else {
                 LoadURL(newPostsUrl);
                 booleanLoadNewPost = false;
             }
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(this);
-        prefs.registerOnSharedPreferenceChangeListener(this);
-        final boolean ParseEveryBody = getSharedPreferences("PARSE_EVERYBODY", MODE_PRIVATE).getBoolean("ParseEveryBody", false);
-        if (!ParseEveryBody)
-            ParsePush.subscribeInBackground("everyBody", new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e == null) {
-                        getSharedPreferences("PARSE_EVERYBODY", MODE_PRIVATE)
-                                .edit()
-                                .putBoolean("ParseEveryBody", true)
-                                .commit();
-                    } else {
-                        getSharedPreferences("PARSE_EVERYBODY", MODE_PRIVATE)
-                                .edit()
-                                .putBoolean("ParseEveryBody", false)
-                                .commit();
-                    }
-                }
-            });
     }
 
-    private void SetUpDrawer() {
+    private void FloatingActionButtonSETUP() {
+        floatingActionButtonBACK.hide(false);
+        floatingActionButtonFORWARD.hide(false);
+        floatingActionButtonBACK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (webViewMain.canGoBack()) {
+                    progressBarLoad.setVisibility(View.VISIBLE);
+                    progressBarLoad.setProgress(0);
+                    webViewMain.goBack();
+                }
+            }
+        });
+        floatingActionButtonFORWARD.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (webViewMain.canGoForward()) {
+                    progressBarLoad.setVisibility(View.VISIBLE);
+                    progressBarLoad.setProgress(0);
+                    webViewMain.goForward();
+                }
+            }
+        });
+    }
+
+    private void DrawerSETUP() {
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setColorScheme(
                 R.color.swipe_color_1, R.color.swipe_color_2,
@@ -453,12 +433,10 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                                             string += "THIS_IS_THE_SPLIT";
                                         }
                                     }
-                                    Log.i("BEFORE_SAVE", "" + string);
                                     getSharedPreferences("FAVOURITES", MODE_PRIVATE).edit().putString("Favourites", string).commit();
                                     dialogInterface.dismiss();
                                     final String stringTwo = getSharedPreferences("FAVOURITES", MODE_PRIVATE).getString("Favourites", "");
                                     if (!stringTwo.equals("")) {
-                                        Log.i("FIRST_GET", "" + string);
                                         listView.setVisibility(View.VISIBLE);
                                         textView.setVisibility(View.INVISIBLE);
                                         String[] stringTwoArray = string.split("THIS_IS_THE_SPLIT");
@@ -498,19 +476,17 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
 
     @Override
     public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
-        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-            if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK))
+            if (mDrawerLayout.isDrawerOpen(mDrawerList))
                 mDrawerLayout.closeDrawer(mDrawerList);
-            }
-        }
         if ((keyCode == KeyEvent.KEYCODE_BACK) && webViewMain.canGoBack() && !mDrawerLayout.isDrawerOpen(mDrawerList)) {
             progressBarLoad.setVisibility(View.VISIBLE);
             progressBarLoad.setProgress(0);
             webViewMain.goBack();
             return true;
         }
-        if ((keyCode == KeyEvent.KEYCODE_BACK) && !webViewMain.canGoBack() && !mDrawerLayout.isDrawerOpen(mDrawerList)) {
-            if (booleanOnKeyDown) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && !webViewMain.canGoBack() && !mDrawerLayout.isDrawerOpen(mDrawerList))
+            if (booleanOnKeyDown)
                 new AlertDialog.Builder(this)
                         .setTitle(getString(R.string.SureExitTitle))
                         .setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener() {
@@ -523,8 +499,8 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                                 dialog.cancel();
                             }
                         }).show();
-            } else finish();
-        }
+            else finish();
+
         return true;
     }
 
@@ -589,21 +565,14 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("OnKeyDown")) {
-            SharedPreferences OnkKeyDownPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            booleanOnKeyDown = OnkKeyDownPref.getBoolean("OnKeyDown", true);
-        }
-        if (key.equals("Screen")) {
-            SharedPreferences ScreenPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            boolean Screen = ScreenPref.getBoolean("Screen", false);
-            if (Screen) {
+        if (key.equals("OnKeyDown"))
+            booleanOnKeyDown = sharedPreferences.getBoolean(key, true);
+        if (key.equals("Screen"))
+            if (sharedPreferences.getBoolean(key, false))
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            } else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        }
-        if (key.equals("BasicZoom")) {
-            SharedPreferences BasicZoomPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            int BasicZoom = Integer.parseInt(BasicZoomPref.getString("BasicZoom", "2"));
-            switch (BasicZoom) {
+            else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        if (key.equals("BasicZoom"))
+            switch (Integer.parseInt(sharedPreferences.getString(key, "2"))) {
                 case 1:
                     webViewMain.getSettings().setTextZoom(100);
                     break;
@@ -617,24 +586,17 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                     webViewMain.getSettings().setTextZoom(160);
                     break;
             }
-        }
-        if (key.equals("Zoom")) {
-            SharedPreferences ZoomPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            boolean Zoom = ZoomPref.getBoolean("Zoom", false);
-            if (Zoom)
+        if (key.equals("Zoom"))
+            if (sharedPreferences.getBoolean(key, false))
                 webViewMain.getSettings().setBuiltInZoomControls(true);
             else
                 webViewMain.getSettings().setBuiltInZoomControls(false);
-        }
         if (key.equals("Notification")) {
-            SharedPreferences NotificationPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            boolean Notification = NotificationPref.getBoolean("Notification", false);
-            if (Notification) {
+            if (sharedPreferences.getBoolean(key, false)) {
                 Intent intent = new Intent();
                 intent.setAction("startService");
                 sendBroadcast(intent);
-            }
-            if (!Notification) {
+            } else {
                 Intent intent = new Intent();
                 intent.setAction("stopService");
                 sendBroadcast(intent);
@@ -643,9 +605,27 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
     }
 
     private void IsItFirstRun() {
-
-        final boolean FirstRunUpdate = getSharedPreferences("FIRST_RUN_UPDATE", MODE_PRIVATE).getBoolean("FirstRunUpdate", true);
-        if (FirstRunUpdate) {
+        ParseInstallation.getCurrentInstallation().saveInBackground();
+        ParseAnalytics.trackAppOpenedInBackground(getIntent());
+        Parse.setLogLevel(Parse.LOG_LEVEL_INFO);
+        if (!getSharedPreferences("PARSE_EVERYBODY", MODE_PRIVATE).getBoolean("ParseEveryBody", false))
+            ParsePush.subscribeInBackground("everyBody", new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e == null) {
+                        getSharedPreferences("PARSE_EVERYBODY", MODE_PRIVATE)
+                                .edit()
+                                .putBoolean("ParseEveryBody", true)
+                                .commit();
+                    } else {
+                        getSharedPreferences("PARSE_EVERYBODY", MODE_PRIVATE)
+                                .edit()
+                                .putBoolean("ParseEveryBody", false)
+                                .commit();
+                    }
+                }
+            });
+        if (getSharedPreferences("FIRST_RUN_UPDATE", MODE_PRIVATE).getBoolean("FirstRunUpdate", true))
             new AlertDialog.Builder(this)
                     .setCancelable(false)
                     .setTitle(getString(R.string.FirstRunMainTitle))
@@ -670,11 +650,8 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                         }
                     })
                     .show();
-        }
-        boolean FirstRunHelp = getSharedPreferences("FIRST_RUN_HELP", MODE_PRIVATE).getBoolean("FirstRunHelp", true);
-        if (FirstRunHelp) {
-            SpannableString email = new SpannableString(getString(R.string.FirstRunHelpMessage) +
-                    "");
+        if (getSharedPreferences("FIRST_RUN_HELP", MODE_PRIVATE).getBoolean("FirstRunHelp", true)) {
+            SpannableString email = new SpannableString(getString(R.string.FirstRunHelpMessage));
             Linkify.addLinks(email, Linkify.EMAIL_ADDRESSES);
             final AlertDialog Dialog = new AlertDialog.Builder(this)
                     .setCancelable(false)
@@ -691,22 +668,18 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
         }
     }
 
-    private void SettingsWebView() {
+    private void getSettings(SharedPreferences sharedPreferences) {
         webViewMain.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webViewMain.getSettings().setLoadsImagesAutomatically(true);
         webViewMain.requestFocusFromTouch();
         webViewMain.getSettings().setJavaScriptEnabled(true);
         webViewMain.setFitsSystemWindows(true);
         webViewMain.getSettings().setDisplayZoomControls(false);
-        SharedPreferences ZoomPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean Zoom = ZoomPref.getBoolean("Zoom", false);
-        if (Zoom)
+        if (sharedPreferences.getBoolean("Zoom", false))
             webViewMain.getSettings().setBuiltInZoomControls(true);
         else
             webViewMain.getSettings().setBuiltInZoomControls(false);
-        SharedPreferences BasicZoomPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        int BasicZoom = Integer.parseInt(BasicZoomPref.getString("BasicZoom", "100"));
-        switch (BasicZoom) {
+        switch (Integer.parseInt(sharedPreferences.getString("BasicZoom", "100"))) {
             case 1:
                 webViewMain.getSettings().setTextZoom(100);
                 break;
@@ -719,19 +692,11 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
             case 4:
                 webViewMain.getSettings().setTextZoom(160);
                 break;
-
         }
-    }
-
-    private void SettingScreen() {
-        SharedPreferences OnkKeyDownPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        booleanOnKeyDown = OnkKeyDownPref.getBoolean("OnKeyDown", true);
-        SharedPreferences ScreenPref = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean Screen = ScreenPref.getBoolean("Screen", false);
-        if (Screen)
+        booleanOnKeyDown = sharedPreferences.getBoolean("OnKeyDown", true);
+        if (sharedPreferences.getBoolean("Screen", false))
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
     }
 
     private void LoadURL(String aURL) {
@@ -742,22 +707,14 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
-        try {
-            super.onSaveInstanceState(outState);
-            webViewMain.saveState(outState);
-        } catch (Exception e) {
-            parseError.sendError("Main.class", "onSaveInstanceState", "" + e, id);
-        }
+        super.onSaveInstanceState(outState);
+        webViewMain.saveState(outState);
     }
 
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        try {
-            super.onRestoreInstanceState(savedInstanceState);
-            webViewMain.restoreState(savedInstanceState);
-        } catch (Exception e) {
-            parseError.sendError("Main.class", "onRestoreInstanceState", "" + e, id);
-        }
+        super.onRestoreInstanceState(savedInstanceState);
+        webViewMain.restoreState(savedInstanceState);
     }
 
     @Override

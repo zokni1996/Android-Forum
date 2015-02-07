@@ -24,26 +24,6 @@
             android:key="NotificationPriority"
             android:summary="%s"
             android:title="@string/Priority" />
-        <CheckBoxPreference
-            android:dependency="Notification"
-            android:key="LastPostNotification"
-            android:summary="@string/OnlyLastSummer"
-            android:title="@string/OnlyLast" />
-        <CheckBoxPreference
-            android:dependency="Notification"
-            android:key="Vibrate"
-            android:summary="@string/VibrateSummary"
-            android:title="@string/Vibrate" />
-        <CheckBoxPreference
-            android:dependency="Notification"
-            android:key="Led"
-            android:summary="@string/LedSummary"
-            android:title="@string/Led" />
-        <CheckBoxPreference
-            android:dependency="Notification"
-            android:key="Sound"
-            android:summary="@string/SoundSummary"
-            android:title="@string/Sound" />
         <ListPreference
             android:defaultValue="4"
             android:dependency="Notification"
