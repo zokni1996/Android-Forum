@@ -1,24 +1,23 @@
-<RelativeLayout
-    android:layout_height="wrap_content"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_height="wrap_content">
 
     <TextView
+        android:id="@+id/favouritesTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/NoFavourites"
-        android:id="@+id/favouritesTextView"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:layout_gravity="center_horizontal"
-        android:background="@color/color_grey"
-        android:textColor="@android:color/black"
+        android:background="@color/gray"
         android:gravity="center_horizontal|center_vertical|center"
         android:padding="10dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:text="@string/NoFavourites"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@android:color/black" />
 
     <ListView
+        android:id="@+id/favouritesListView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/favouritesListView" />
+        android:layout_height="wrap_content" />
 </RelativeLayout>

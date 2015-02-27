@@ -10,7 +10,7 @@
         android:id="@+id/Toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/color_green"
+        android:background="@color/green"
         app:popupTheme="@style/Theme.AppCompat"
         app:theme="@style/ToolbarTheme" />
 
@@ -46,9 +46,9 @@
                 android:layout_margin="8dp"
                 android:padding="5dp"
                 android:src="@drawable/ic_navigation_arrow_forward"
-                fab:fab_colorNormal="@color/orange_primary"
-                fab:fab_colorPressed="@color/orange_pressed"
-                fab:fab_colorRipple="@color/orange_pressed"
+                fab:fab_colorNormal="@color/blue"
+                fab:fab_colorPressed="@color/blue_darker"
+                fab:fab_colorRipple="@color/blue_darker"
                 fab:fab_type="normal" />
 
             <com.melnykov.fab.FloatingActionButton xmlns:fab="http://schemas.android.com/apk/res-auto"
@@ -60,20 +60,10 @@
                 android:layout_gravity="bottom|right"
                 android:layout_margin="8dp"
                 android:src="@drawable/ic_navigation_arrow_back"
-                fab:fab_colorNormal="@color/orange_primary"
-                fab:fab_colorPressed="@color/orange_pressed"
-                fab:fab_colorRipple="@color/orange_pressed"
+                fab:fab_colorNormal="@color/blue"
+                fab:fab_colorPressed="@color/blue_darker"
+                fab:fab_colorRipple="@color/blue_darker"
                 fab:fab_type="normal" />
-
-            <ProgressBar
-                android:id="@+id/ProgressBar"
-                style="@style/ProgressBarTheme"
-                android:layout_width="fill_parent"
-                android:layout_height="20dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:background="@color/color_green" />
 
         </RelativeLayout>
 

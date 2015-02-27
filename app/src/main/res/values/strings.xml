@@ -37,7 +37,7 @@
     <string name="AboutMe2">I NEED SOME PEOPLE!</string>
     <string name="AboutMe3">\nI need a person, who will translate the application text other LANGUAGES! If you would like to help, please write an e-mail (above the link) \n</string>
     <string name="AboutMe4">Thanks, to read this, and use my application! :)</string>
-    <string name="AboutMe5">Papi54 - The testing (it\'s very important)\nhunterzsolt - The suggestions\nszornyu - The plus information</string>
+    <string name="AboutMe5">Papi54 - The testing (it\'s very important)\nhunterzsolt - The suggestions\nszornyu - The plus information\niDroid - For the help!</string>
     <string name="AboutMe6">Please leave questions, bug reports, or comments on the forum!\n</string>
     <string name="AboutMe7">Home page: http://android-forum.hu/</string>
     <string name="AboutMe8"><![CDATA[Forum: http://android-forum.hu/viewtopic.php?f=43&t=917]]></string>
@@ -142,4 +142,5 @@
     <string name="OnlyLastSummer">Show the last topic, from the new posts</string>
 
     <string name="application_version">Failed to get application version</string>
+    <string name="LastPostsNumber">Last posts number</string>
 </resources>

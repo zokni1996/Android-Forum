@@ -38,7 +38,7 @@
     <string name="AboutMe4">Köszönöm, hogy végig olvastad, és hogy használod az alkamazást! :)</string>
     <string name="NotificationContentTitle">Új hozzászólás érkezett!</string>
     <string name="NotificationContentText">Kattints ide, hogy megnyisd az alkalmazást! :)</string>
-    <string name="AboutMe5">Papi54 - A tesztelésért\nhunterzsolt - A tanácsokért\nszornyu - A plusz infórmációkért\iDroid - A segítségért!</string>
+    <string name="AboutMe5">Papi54 - A tesztelésért\nhunterzsolt - A tanácsokért\nszornyu - A plusz infórmációkért\niDroid - A segítségért!</string>
     <string name="AboutMe6">Kérlek a kéréseket, hibajelentéseket, vagy egyéb megjegyzéseket a fórumon tedd!\n</string>
     <string name="AboutMe7">Kezdőlap: http://android-forum.hu/</string>
     <string name="AboutMe8"><![CDATA[Fórum: http://android-forum.hu/viewtopic.php?f=43&t=917]]></string>
@@ -141,4 +141,5 @@
     <string name="OnlyLast">Csak az utolsó</string>
     <string name="OnlyLastSummer">A legutolsó téma, amibe érkezett a hozzászólás jelenik meg</string>
     <string name="application_version">Nem sikerült meghatározni az alkalmazás verziót</string>
+    <string name="LastPostsNumber">Utolsó hozzászólások száma</string>
 </resources>

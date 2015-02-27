@@ -18,7 +18,7 @@
             android:summary="@string/ZoomSummary"
             android:title="@string/ZoomWithHand" />
         <ListPreference
-            android:defaultValue="1"
+            android:defaultValue="100"
             android:entries="@array/Zoom"
             android:entryValues="@array/ZoomNumbers"
             android:key="BasicZoom"

@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -24,14 +23,13 @@ import hu.zokni1996.android_forum.Main.Splash;
 import hu.zokni1996.android_forum.Parse.ParseError;
 import hu.zokni1996.android_forum.R;
 
-public class MainService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainService extends Service {
 
-    private String id = "";
     private boolean enabledBoolean = true;
-    private boolean lastPostShow = false;
-    private int timeCheck = 300000;
+    private int timeCheck;
     private int NotificationPriorityInt;
     private int NotificationStyleInt;
+    private int NotificationRowInt;
     private NotificationCompat.InboxStyle inboxStyle;
     private ParseError parseError = new ParseError();
 
@@ -43,11 +41,7 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         enabledBoolean = true;
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.registerOnSharedPreferenceChangeListener(this);
         getSettings();
-        id = android.provider.Settings.Secure.getString(getApplicationContext().getContentResolver(),
-                android.provider.Settings.Secure.ANDROID_ID);
         new MySync().start();
         return START_STICKY;
 
@@ -57,67 +51,6 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
     public void onDestroy() {
         enabledBoolean = false;
         super.onDestroy();
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("NotificationStyle")) {
-            int NotificationStyle = Integer.parseInt(sharedPreferences.getString(key, "4"));
-            switch (NotificationStyle) {
-                case 1:
-                    NotificationStyleInt = 1;
-                    break;
-                case 2:
-                    NotificationStyleInt = 2;
-                    break;
-                case 3:
-                    NotificationStyleInt = 3;
-                    break;
-                case 4:
-                    NotificationStyleInt = 4;
-                    break;
-            }
-        }
-        if (key.equals("NotificationTimeCheck")) {
-            int NotificationTimeCheck = Integer.parseInt(sharedPreferences.getString(key, "1"));
-            switch (NotificationTimeCheck) {
-                case 1:
-                    timeCheck = 300000;
-                    break;
-                case 2:
-                    timeCheck = 600000;
-                    break;
-                case 3:
-                    timeCheck = 1800000;
-                    break;
-                case 4:
-                    timeCheck = 3600000;
-                    break;
-                case 5:
-                    timeCheck = 7200000;
-                    break;
-            }
-        }
-        if (key.equals("NotificationPriority")) {
-            int NotificationPriority = Integer.parseInt(sharedPreferences.getString(key, "1"));
-            switch (NotificationPriority) {
-                case 1:
-                    NotificationPriorityInt = Notification.PRIORITY_DEFAULT;
-                    break;
-                case 2:
-                    NotificationPriorityInt = Notification.PRIORITY_MIN;
-                    break;
-                case 3:
-                    NotificationPriorityInt = Notification.PRIORITY_LOW;
-                    break;
-                case 4:
-                    NotificationPriorityInt = Notification.PRIORITY_HIGH;
-                    break;
-                case 5:
-                    NotificationPriorityInt = Notification.PRIORITY_MAX;
-                    break;
-            }
-        }
     }
 
     private boolean updateConnectedFlags() {
@@ -142,7 +75,9 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
                 .setContentText(getString(R.string.NotificationContentText))
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setPriority(NotificationPriorityInt)
-                .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0));
+                .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+                .setColor(getResources().getColor(R.color.green))
+                .setCategory(ACTIVITY_SERVICE);
         inboxStyle = new NotificationCompat.InboxStyle();
         inboxStyle.setBigContentTitle(getString(R.string.TheLatestPostsTitle));
 
@@ -154,26 +89,26 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
         if (NotificationStyleInt == 1)
             try {
                 NotificationStyleInt1(titleArray, updatedArray);
-            } catch (NullPointerException e) {
-                parseError.sendError("MainService.class", "NotificationStyleInt 1", "" + e, id);
+            } catch (Exception e) {
+                parseError.sendError("MainService.class", "NotificationStyleInt 1", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
             }
         if (NotificationStyleInt == 2)
             try {
                 NotificationStyleInt2(titleArray, updatedArray);
-            } catch (NullPointerException e) {
-                parseError.sendError("MainService.class", "NotificationStyleInt 2", "" + e, id);
+            } catch (Exception e) {
+                parseError.sendError("MainService.class", "NotificationStyleInt 2", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
             }
         if (NotificationStyleInt == 3)
             try {
                 NotificationStyleInt3(titleArray);
-            } catch (NullPointerException e) {
-                parseError.sendError("MainService.class", "NotificationStyleInt 3", "" + e, id);
+            } catch (Exception e) {
+                parseError.sendError("MainService.class", "NotificationStyleInt 3", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
             }
         if (NotificationStyleInt == 4)
             try {
                 NotificationStyleInt4(titleArray, updatedArray);
-            } catch (NullPointerException e) {
-                parseError.sendError("MainService.class", "NotificationStyleInt 4", "" + e, id);
+            } catch (Exception e) {
+                parseError.sendError("MainService.class", "NotificationStyleInt 4", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
             }
         mBuilder.setStyle(inboxStyle);
         mBuilder.build();
@@ -217,61 +152,13 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
     }
 
     private void getSettings() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        int NotificationStyle = Integer.parseInt(sharedPreferences.getString("NotificationStyle", "4"));
-        switch (NotificationStyle) {
-            case 1:
-                NotificationStyleInt = 1;
-                break;
-            case 2:
-                NotificationStyleInt = 2;
-                break;
-            case 3:
-                NotificationStyleInt = 3;
-                break;
-            case 4:
-                NotificationStyleInt = 4;
-                break;
-        }
-        int NotificationTimeCheck = Integer.parseInt(sharedPreferences.getString("NotificationTimeCheck", "1"));
-        switch (NotificationTimeCheck) {
-            case 1:
-                timeCheck = 300000;
-                break;
-            case 2:
-                timeCheck = 600000;
-                break;
-            case 3:
-                timeCheck = 1800000;
-                break;
-            case 4:
-                timeCheck = 3600000;
-                break;
-            case 5:
-                timeCheck = 7200000;
-                break;
-        }
-        int NotificationPriority = Integer.parseInt(sharedPreferences.getString("NotificationPriority", "1"));
-        switch (NotificationPriority) {
-            case 1:
-                NotificationPriorityInt = Notification.PRIORITY_DEFAULT;
-                break;
-            case 2:
-                NotificationPriorityInt = Notification.PRIORITY_MIN;
-                break;
-            case 3:
-                NotificationPriorityInt = Notification.PRIORITY_LOW;
-                break;
-            case 4:
-                NotificationPriorityInt = Notification.PRIORITY_HIGH;
-                break;
-            case 5:
-                NotificationPriorityInt = Notification.PRIORITY_MAX;
-                break;
-        }
+        NotificationStyleInt = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("NotificationStyle", "4"));
+        timeCheck = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("NotificationTimeCheck", "300000"));
+        NotificationPriorityInt = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("NotificationPriority", "0"));
+        NotificationRowInt = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("NotificationRow", "1"));
     }
 
-    private void NotificationStyleInt1(String[] titleArray, String[] updatedArray) throws NullPointerException {
+    private void NotificationStyleInt1(String[] titleArray, String[] updatedArray) throws Exception {
         String topicNameString = "• ";
         for (String aNewPostsArray : titleArray) {
             boolean you = true;
@@ -298,20 +185,14 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
             }
         }
         String[] topicArray = topicNameString.split("THIS_IS_THE_SPLIT");
-        if (!lastPostShow)
-            for (int i = 0; i < topicArray.length; i++) {
+        if (topicArray.length >= NotificationRowInt && updatedArray.length >= NotificationRowInt)
+            for (int i = 0; i < NotificationRowInt; i++) {
                 topicArray[i] += updatedArray[i];
                 inboxStyle.addLine(topicArray[i]);
             }
-        else {
-            topicArray[0] += updatedArray[0];
-            inboxStyle.addLine(topicArray[0]);
-        }
-        for (int i = 0; i < topicArray.length; i++)
-            topicArray[i] = "";
     }
 
-    private void NotificationStyleInt2(String[] titleArray, String[] updatedArray) throws NullPointerException {
+    private void NotificationStyleInt2(String[] titleArray, String[] updatedArray) throws Exception {
         String forumString = "•";
         for (String aNewPostsArray : titleArray) {
             boolean you = true;
@@ -346,35 +227,24 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
             }
         }
         String[] forumArray = forumString.split("THIS_IS_THE_SPLIT");
-        if (!lastPostShow)
-            for (int i = 0; i < forumArray.length; i++) {
+        if (forumArray.length >= NotificationRowInt && updatedArray.length >= NotificationRowInt)
+            for (int i = 0; i < NotificationRowInt; i++) {
                 forumArray[i] += updatedArray[i];
                 inboxStyle.addLine(forumArray[i]);
             }
-        else {
-            forumArray[0] += updatedArray[0];
-            inboxStyle.addLine(forumArray[0]);
-        }
-        for (int i = 0; i < forumArray.length; i++)
-            forumArray[i] = "";
     }
 
-    private void NotificationStyleInt3(String[] titleArray) throws NullPointerException {
-        if (!lastPostShow)
-            for (String aNewPostsArray : titleArray) inboxStyle.addLine(aNewPostsArray);
-        else inboxStyle.addLine(titleArray[0]);
+    private void NotificationStyleInt3(String[] titleArray) throws Exception {
+        if (titleArray.length >= NotificationRowInt)
+            for (int i = 0; i < NotificationRowInt; i++) inboxStyle.addLine(titleArray[i]);
     }
 
-    private void NotificationStyleInt4(String[] titleArray, String[] updatedArray) throws NullPointerException {
-        if (!lastPostShow)
-            for (int i = 0; i < titleArray.length; i++) {
+    private void NotificationStyleInt4(String[] titleArray, String[] updatedArray) throws Exception {
+        if (titleArray.length >= NotificationRowInt && updatedArray.length >= NotificationRowInt)
+            for (int i = 0; i < NotificationRowInt; i++) {
                 titleArray[i] += updatedArray[i];
                 inboxStyle.addLine(titleArray[i]);
             }
-        else {
-            titleArray[0] += updatedArray[0];
-            inboxStyle.addLine(titleArray[0]);
-        }
     }
 
     private class MySync extends Thread {
@@ -387,14 +257,14 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
                     try {
                         sleep(timeCheck);
                     } catch (InterruptedException e) {
-                        parseError.sendError("MainService.class", "The sleep interrupted:", "" + e, id);
+                        parseError.sendError("MainService.class", "The sleep interrupted:", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
                     }
                 } else {
                     getSettings();
                     try {
                         sleep(timeCheck);
                     } catch (InterruptedException e) {
-                        parseError.sendError("MainService.class", "The sleep interrupted:", "" + e, id);
+                        parseError.sendError("MainService.class", "The sleep interrupted:", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
                     }
                 }
             }
@@ -434,7 +304,7 @@ public class MainService extends Service implements SharedPreferences.OnSharedPr
                 /* Get the latest post time */
                 stringUPDATED = updated.get(0).text();
             } catch (IOException e) {
-                parseError.sendError("MainService.java", "DOWNLOAD_FEED", "" + e, id);
+                parseError.sendError("MainService.java", "DOWNLOAD_FEED", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
             }
             return null;
         }

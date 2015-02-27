@@ -6,24 +6,30 @@ import com.parse.ParseObject;
 
 public class ParseError {
 
-    String StringActivity;
-    String TAG;
-    String getErrorString;
-    String DeviceID;
+    String activity;
+    String tag;
+    String e;
+    String cause;
+    String localiseMessage;
+    String message;
 
 
-    public void sendError(String StringActivityConstructor, String TAG, String getErrorString, String DeviceIDConstructor) {
-        this.StringActivity = StringActivityConstructor;
-        this.TAG = TAG;
-        this.getErrorString = getErrorString;
-        this.DeviceID = DeviceIDConstructor;
+    public void sendError(String activity, String tag, String e, String cause, String localiseMessage, String message) {
+        this.activity = activity;
+        this.tag = tag;
+        this.e = e;
+        this.cause = cause;
+        this.localiseMessage = localiseMessage;
+        this.message = message;
         ParseObject error = new ParseObject("Error");
         error.put("DeviceName", GetDeviceName());
         error.put("OS", Build.VERSION.SDK_INT);
-        error.put("DeviceID", DeviceID);
-        error.put("ErrorCode", getErrorString);
-        error.put("TAG", TAG);
-        error.put("Activity", StringActivity);
+        error.put("ExceptionE", e);
+        error.put("TAG", tag);
+        error.put("Activity", activity);
+        error.put("Cause", cause);
+        error.put("LocaliseMessage", localiseMessage);
+        error.put("Message", message);
         error.saveEventually();
     }
 

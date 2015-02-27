@@ -7,10 +7,10 @@
         <item>160%</item>
     </string-array>
     <string-array name="ZoomNumbers">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
+        <item>100</item>
+        <item>120</item>
+        <item>140</item>
+        <item>160</item>
     </string-array>
     <string-array name="NotificationTimeCheck">
         <item>5 perc</item>
@@ -20,11 +20,11 @@
         <item>2 óra</item>
     </string-array>
     <string-array name="NotificationTimeCheckNumbers">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
+        <item>300000</item>
+        <item>600000</item>
+        <item>1800000</item>
+        <item>3600000</item>
+        <item>7200000</item>
     </string-array>
     <string-array name="NotificationPriority">
         <item>Általános prioritás</item>
@@ -34,11 +34,11 @@
         <item>Max prioritás</item>
     </string-array>
     <string-array name="NotificationPriorityNumbers">
+        <item>0</item>
+        <item>-2</item>
+        <item>-1</item>
         <item>1</item>
         <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
     </string-array>
     <string-array name="NotificationStyle">
         <item>Topik név, dátum</item>
@@ -64,5 +64,21 @@
         <item>Megválaszolatlan hsz.-ek</item>
         <item>Olvasatlan hsz.-ek</item>
         <item>Beállítások</item>
+    </string-array>
+
+    <string-array name="NotificationRow">
+        <item>Legutolsó hozzászólás</item>
+        <item>Utolsó 2 hozzászólás</item>
+        <item>Utolsó 3 hozzászólás</item>
+        <item>Utolsó 4 hozzászólás</item>
+        <item>Utolsó 5 hozzászólás</item>
+    </string-array>
+
+    <string-array name="NotificationRowNumbers">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
     </string-array>
 </resources>

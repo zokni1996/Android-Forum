@@ -9,7 +9,7 @@
             android:summary="@string/NotificationSummary"
             android:title="@string/Notification" />
         <ListPreference
-            android:defaultValue="1"
+            android:defaultValue="300000"
             android:dependency="Notification"
             android:entries="@array/NotificationTimeCheck"
             android:entryValues="@array/NotificationTimeCheckNumbers"
@@ -17,7 +17,7 @@
             android:summary="%s"
             android:title="@string/Refresh" />
         <ListPreference
-            android:defaultValue="1"
+            android:defaultValue="0"
             android:dependency="Notification"
             android:entries="@array/NotificationPriority"
             android:entryValues="@array/NotificationPriorityNumbers"
@@ -32,6 +32,14 @@
             android:key="NotificationStyle"
             android:summary="%s"
             android:title="@string/Style" />
+        <ListPreference
+            android:defaultValue="1"
+            android:dependency="Notification"
+            android:entries="@array/NotificationRow"
+            android:entryValues="@array/NotificationRowNumbers"
+            android:key="NotificationRow"
+            android:summary="%s"
+            android:title="@string/LastPostsNumber" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/ParseSwitchTitle">
         <CheckBoxPreference

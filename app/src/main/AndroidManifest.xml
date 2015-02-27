@@ -21,13 +21,13 @@
         android:name=".Parse.RegisterApplication"
         android:allowBackup="true"
         android:anyDensity="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/NameApp">
         <activity
             android:name="hu.zokni1996.android_forum.Main.Splash"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Base">
+            android:theme="@style/ThemeSplash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -52,8 +52,8 @@
         <receiver android:name=".Service.MainReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="startService" />
-                <action android:name="stopService" />
+                <action android:name="startServiceAndroidForum" />
+                <action android:name="stopServiceAndroidForum" />
                 <action android:name="android.intent.action.BATTERY_LOW" />
             </intent-filter>
         </receiver>
@@ -71,7 +71,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".Parse.ParsePushBroadcastReceiverNotification"
+            android:name="com.parse.ParsePushBroadcastReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />

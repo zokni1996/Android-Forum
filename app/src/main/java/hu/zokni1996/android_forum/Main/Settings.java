@@ -45,17 +45,14 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Locale;
 
-import hu.zokni1996.android_forum.Parse.ParseError;
 import hu.zokni1996.android_forum.R;
 
 public class Settings extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     static String changeLogHun = "";
     static String changeLogEng = "";
-    static String id = "";
     static ProgressDialog progressDialog;
     static ActionBar actionBar;
-    private static ParseError parseError = new ParseError();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,17 +60,11 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
             setTheme(android.R.style.Theme_Material_Light);
         else setTheme(R.style.StyleThemeSettings);
 
-        id = android.provider.Settings.Secure.getString(getApplicationContext().getContentResolver(),
-                android.provider.Settings.Secure.ANDROID_ID);
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
         actionBar = getActionBar();
         if (actionBar != null)
             actionBar.setIcon(R.drawable.ic_action_action_settings_holo_light);
-        try {
-            super.onCreate(savedInstanceState);
-        } catch (Exception e) {
-            parseError.sendError("Settings.class", "onCreate", "" + e, id);
-        }
+        super.onCreate(savedInstanceState);
     }
 
     @Override
