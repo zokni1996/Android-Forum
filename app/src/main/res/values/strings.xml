@@ -143,4 +143,8 @@
 
     <string name="application_version">Failed to get application version</string>
     <string name="LastPostsNumber">Last posts number</string>
+    <string name="web_error_code"><![CDATA[" •</div><hr /><div style=\"text-align: center;\">Error code: • "]]></string>
+    <string name="web_error_code_2"><![CDATA[" •</div>"]]></string>
+    <string name="statistic_send_who">"Statistic: Sent Wrote by: "</string>
+    <string name="who_write">"Wrote: "</string>
 </resources>

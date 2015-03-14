@@ -142,4 +142,8 @@
     <string name="OnlyLastSummer">A legutolsó téma, amibe érkezett a hozzászólás jelenik meg</string>
     <string name="application_version">Nem sikerült meghatározni az alkalmazás verziót</string>
     <string name="LastPostsNumber">Utolsó hozzászólások száma</string>
+    <string name="web_error_code"><![CDATA[" •</div><hr /><div style=\"text-align: center;\">Hiba kód: • "]]></string>
+    <string name="web_error_code_2"><![CDATA[" •</div>"]]></string>
+    <string name="statistic_send_who">"Statisztika: Elküldve Szerző: "</string>
+    <string name="who_write">"Írta: "</string>
 </resources>

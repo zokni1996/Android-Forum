@@ -111,7 +111,7 @@ ADDED from AndroidManifest.xml:43:9
 		ADDED from AndroidManifest.xml:45:13
 	android:name
 		ADDED from AndroidManifest.xml:44:13
-service#hu.zokni1996.android_forum.Service.MainService
+service#MainService
 ADDED from AndroidManifest.xml:47:9
 	android:enabled
 		ADDED from AndroidManifest.xml:49:13
@@ -119,7 +119,7 @@ ADDED from AndroidManifest.xml:47:9
 		ADDED from AndroidManifest.xml:50:13
 	android:name
 		ADDED from AndroidManifest.xml:48:13
-receiver#hu.zokni1996.android_forum.Service.MainReceiver
+receiver#MainReceiver
 ADDED from AndroidManifest.xml:52:9
 	android:name
 		ADDED from AndroidManifest.xml:52:19

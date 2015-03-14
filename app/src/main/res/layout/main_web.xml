@@ -1,80 +1,47 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".Main.Main">
+    android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/Toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/green"
-        app:popupTheme="@style/Theme.AppCompat"
-        app:theme="@style/ToolbarTheme" />
+    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/SwipeContainer"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
 
-    <android.support.v4.widget.DrawerLayout
-        android:id="@+id/Drawer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        <WebView
+            android:id="@+id/WebViewMain"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+    <com.melnykov.fab.FloatingActionButton xmlns:fab="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/WebViewForward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="8dp"
+        android:padding="5dp"
+        android:src="@drawable/ic_navigation_arrow_forward"
+        fab:fab_colorNormal="@color/blue"
+        fab:fab_colorPressed="@color/blue_darker"
+        fab:fab_colorRipple="@color/blue_darker"
+        fab:fab_type="normal" />
 
-            <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/SwipeContainer"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
+    <com.melnykov.fab.FloatingActionButton xmlns:fab="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/WebViewBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="8dp"
+        android:src="@drawable/ic_navigation_arrow_back"
+        fab:fab_colorNormal="@color/blue"
+        fab:fab_colorPressed="@color/blue_darker"
+        fab:fab_colorRipple="@color/blue_darker"
+        fab:fab_type="normal" />
 
-
-                <WebView
-                    android:id="@+id/WebViewMain"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent" />
-            </android.support.v4.widget.SwipeRefreshLayout>
-
-            <com.melnykov.fab.FloatingActionButton xmlns:fab="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/WebViewForward"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_gravity="bottom|right"
-                android:layout_margin="8dp"
-                android:padding="5dp"
-                android:src="@drawable/ic_navigation_arrow_forward"
-                fab:fab_colorNormal="@color/blue"
-                fab:fab_colorPressed="@color/blue_darker"
-                fab:fab_colorRipple="@color/blue_darker"
-                fab:fab_type="normal" />
-
-            <com.melnykov.fab.FloatingActionButton xmlns:fab="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/WebViewBack"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:layout_gravity="bottom|right"
-                android:layout_margin="8dp"
-                android:src="@drawable/ic_navigation_arrow_back"
-                fab:fab_colorNormal="@color/blue"
-                fab:fab_colorPressed="@color/blue_darker"
-                fab:fab_colorRipple="@color/blue_darker"
-                fab:fab_type="normal" />
-
-        </RelativeLayout>
-
-        <ListView
-            android:id="@android:id/list"
-            android:layout_width="250dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:background="@android:color/white" />
-
-    </android.support.v4.widget.DrawerLayout>
-</LinearLayout>
-
-
+</RelativeLayout>

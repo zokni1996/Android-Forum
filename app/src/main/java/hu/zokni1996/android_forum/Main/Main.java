@@ -8,14 +8,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.AssetManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
@@ -27,68 +25,36 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.WindowManager;
-import android.webkit.HttpAuthHandler;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.melnykov.fab.FloatingActionButton;
-import com.parse.Parse;
-import com.parse.ParseAnalytics;
-import com.parse.ParseException;
-import com.parse.ParseInstallation;
-import com.parse.ParsePush;
-import com.parse.SaveCallback;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import hu.zokni1996.android_forum.Items.Items;
-import hu.zokni1996.android_forum.Parse.ParseError;
+import hu.zokni1996.android_forum.Main.ActiveTopics.ActiveTopicsFragment;
+import hu.zokni1996.android_forum.Main.Web.WebFragment;
 import hu.zokni1996.android_forum.R;
 
-public class Main extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, SwipeRefreshLayout.OnRefreshListener {
+public class Main extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, WebFragment.WebFragmentWebClicked {
 
-    private WebView webViewMain = null;
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private Toolbar toolbar;
-    private ParseError parseError = new ParseError();
-    private List<Items> itemsList = new ArrayList<>();
-    private ProgressBar progressBarLoad;
-    private FloatingActionButton floatingActionButtonBACK;
-    private FloatingActionButton floatingActionButtonFORWARD;
-    private boolean booleanClearHistory = true;
-    private boolean booleanOnKeyDown = true;
-    private String[] stringFailedLoadPage = new String[2];
-    private String stringFailingURL = "";
-    private String mainUrl = "http://android-forum.hu/index.php?mobile=mobile";
-    private String newPostsUrl = "http://android-forum.hu/search.php?mobile=mobile&search_id=active_topics";
-    private String titleWebView = "";
-    private boolean booleanFailedLoadURL = false;
-    private boolean booleanReloadSwipe = false;
-    private boolean booleanLoadNewPost = false;
-    private boolean booleanMenu = true;
+    DrawerLayout mDrawerLayout;
+    ListView mDrawerList;
+    List<Items> itemsList = new ArrayList<>();
+    boolean booleanMenu = true;
+    ActionBarDrawerToggle mDrawerToggle;
+    Toolbar toolbar;
+    WebFragment webFragment;
+    boolean booleanOnKeyDown = true;
+    ActiveTopicsFragment activeTopicsFragment;
+    ActionBar actionBar;
+    boolean booleanLoadNewPost = false;
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -103,277 +69,43 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_web);
-        InitializeParse();
+        setContentView(R.layout.main_main);
 
         //Get the references for the objects
-        webViewMain = (WebView) findViewById(R.id.WebViewMain);
-        progressBarLoad = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
         toolbar = (Toolbar) findViewById(R.id.Toolbar);
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.SwipeContainer);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.Drawer);
         mDrawerList = (ListView) findViewById(android.R.id.list);
-        floatingActionButtonBACK = (FloatingActionButton) findViewById(R.id.WebViewBack);
-        floatingActionButtonFORWARD = (FloatingActionButton) findViewById(R.id.WebViewForward);
 
-        //Setup and initialize some things
-        FloatingActionButtonSETUP();
         DrawerSETUP();
-        ProgressBarSETUP();
-
-        //Check who started the app (notification or launcher)
-        Bundle extras = getIntent().getExtras();
-        if (extras != null)
-            booleanLoadNewPost = extras.getBoolean("nameID");
 
         //Cancel all the application notification
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancelAll();
+        Bundle extras = getIntent().getExtras();
+        if (extras != null)
+            booleanLoadNewPost = extras.getBoolean("nameID");
 
         //Register preference changer
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
-        getSettings(PreferenceManager.getDefaultSharedPreferences(this));
+        booleanOnKeyDown = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("OnKeyDown", true);
 
-        //Set web client, and chrome client
-        webViewMain.setWebViewClient(new WebViewClient() {
-            //TESTING!!!!
-            @Override
-            public void onReceivedHttpAuthRequest(final WebView view, @NonNull final HttpAuthHandler handler, final String host, final String realm) {
-                super.onReceivedHttpAuthRequest(view, handler, host, realm);
-                final Dialog dialog = new Dialog(Main.this);
-                dialog.setTitle(getString(R.string.ParseLogIn));
-                dialog.setCancelable(false);
-                dialog.setContentView(R.layout.main_on_received_http_auth_request);
-                final Button button = (Button) dialog.findViewById(R.id.buttonHttpAuthRequest);
-                final EditText editTextUsername = (EditText) dialog.findViewById(R.id.editTextHttpAuthRequestUsername);
-                final EditText editTextPassword = (EditText) dialog.findViewById(R.id.editTextHttpAuthRequestPassword);
-                final TextView textView = (TextView) dialog.findViewById(R.id.textViewHttpAuthRequestTitle);
-                textView.setText("A " + host + " belépést kér a következő oldalhoz: " + view.getUrl());
-                TextWatcher textWatcher = new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                        if (editTextPassword.getText().toString().length() > 0 &&
-                                editTextUsername.getText().toString().length() > 0)
-                            button.setEnabled(true);
-                        else button.setEnabled(false);
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if (editTextPassword.getText().toString().length() > 0 &&
-                                editTextUsername.getText().toString().length() > 0)
-                            button.setEnabled(true);
-                        else button.setEnabled(false);
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        if (editTextPassword.getText().toString().length() > 0 &&
-                                editTextUsername.getText().toString().length() > 0)
-                            button.setEnabled(true);
-                        else button.setEnabled(false);
-                    }
-                };
-                editTextPassword.addTextChangedListener(textWatcher);
-                editTextUsername.addTextChangedListener(textWatcher);
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        try {
-                            handler.proceed(editTextUsername.getText().toString(), editTextPassword.getText().toString());
-                            handler.useHttpAuthUsernamePassword();
-                            dialog.dismiss();
-                        } catch (Exception e) {
-                            parseError.sendError("Main.java", "AUTH_USERNAME_PASSWORD", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
-                        }
-                    }
-                });
-                dialog.show();
-            }
-
-            @Override
-            public void onReceivedError(WebView view, int errorCode,
-                                        String description, String failingUrl) {
-                String CurrentLanguage = Locale.getDefault().getDisplayLanguage();
-
-                if (CurrentLanguage.equals("magyar")) {
-                    try {
-                        InputStream input;
-                        AssetManager assetManager = getApplicationContext().getAssets();
-                        input = assetManager.open("failedLoadPage");
-                        BufferedReader f = new BufferedReader(new InputStreamReader(input));
-                        String sor = f.readLine();
-                        stringFailedLoadPage[0] = sor;
-                        stringFailedLoadPage[0] += " " + description + " •</div><hr /><div style=\"text-align: center;\">Hiba kódja: • " + errorCode + " •</div>";
-                        stringFailedLoadPage[0] += "<hr />";
-                        stringFailingURL = failingUrl;
-                        booleanFailedLoadURL = true;
-                        input.close();
-                    } catch (IOException e) {
-                        parseError.sendError("Main.java", "OnReceivedError", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
-                    }
-                    view.loadDataWithBaseURL(null, stringFailedLoadPage[0], "text/html; charset=utf-8", "UTF-8",
-                            null);
-                } else {
-                    try {
-                        InputStream input;
-                        AssetManager assetManager = getApplicationContext().getAssets();
-                        input = assetManager.open("failedLoadPage");
-                        BufferedReader f = new BufferedReader(new InputStreamReader(input));
-                        String sor = f.readLine();
-                        stringFailedLoadPage[1] = sor;
-                        stringFailedLoadPage[1] += " " + description + " •</div><hr /><div style=\"text-align: center;\">Error code: • " + errorCode + " •</div>";
-                        stringFailingURL = failingUrl;
-                        booleanFailedLoadURL = true;
-                        input.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    view.loadDataWithBaseURL(null, stringFailedLoadPage[1], "text/html; charset=utf-8", "UTF-8",
-                            null);
-                }
-            }
-
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                super.onPageStarted(view, url, favicon);
-                progressBarLoad.setVisibility(View.VISIBLE);
-                progressBarLoad.setProgress(1);
-            }
-
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                progressBarLoad.setVisibility(View.VISIBLE);
-                progressBarLoad.setProgress(0);
-                LoadURL(url);
-                return false;
-            }
-
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                if (booleanClearHistory) {
-                    booleanClearHistory = false;
-                    webViewMain.clearHistory();
-                    if (!webViewMain.canGoBack())
-                        floatingActionButtonBACK.hide();
-                    else floatingActionButtonBACK.show();
-                    if (!webViewMain.canGoForward())
-                        floatingActionButtonFORWARD.hide();
-                    else floatingActionButtonFORWARD.show();
-                } else {
-                    if (!webViewMain.canGoBack())
-                        floatingActionButtonBACK.hide();
-                    else floatingActionButtonBACK.show();
-                    if (!webViewMain.canGoForward())
-                        floatingActionButtonFORWARD.hide();
-                    else floatingActionButtonFORWARD.show();
-                }
-                if (booleanReloadSwipe) {
-                    booleanReloadSwipe = false;
-                    swipeRefreshLayout.setRefreshing(false);
-
-                }
-                String stringTitle = webViewMain.getTitle();
-                try {
-                    String titleTwo = "";
-                    for (int i = 0; i < stringTitle.length(); i++) {
-                        if (stringTitle.charAt(i) == '•' && stringTitle.length() >= i + 2) {
-                            for (int j = i + 2; j < stringTitle.length(); j++) {
-                                titleTwo += stringTitle.charAt(j);
-                            }
-                        }
-                    }
-                    getSupportActionBar().setTitle(titleTwo);
-                    titleWebView = titleTwo;
-                } catch (Exception e) {
-                    parseError.sendError("Main.class", "setTitleError", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
-                    getSupportActionBar().setTitle(stringTitle);
-                    titleWebView = stringTitle;
-                }
-                if (booleanFailedLoadURL) {
-                    String CurrentLanguage = Locale.getDefault().getDisplayLanguage();
-                    if (CurrentLanguage.equals("magyar"))
-                        getSupportActionBar().setTitle(getString(R.string.FailedLoadURL));
-                    else
-                        getSupportActionBar().setTitle(getString(R.string.FailedLoadURL));
-                }
-                super.onPageFinished(view, url);
-            }
-
-        });
-        webViewMain.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public void onProgressChanged(WebView view, int progress) {
-                if (progress < 100) {
-                    progressBarLoad.setVisibility(ProgressBar.VISIBLE);
-                }
-                progressBarLoad.setProgress(progress);
-                if (progress == 100) {
-                    progressBarLoad.setVisibility(ProgressBar.GONE);
-                }
-            }
-        });
-
-        //Defend reload whe orientation changed
-        if (savedInstanceState == null)
-            if (!booleanLoadNewPost)
-                LoadURL(mainUrl);
-            else {
-                LoadURL(newPostsUrl);
-                booleanLoadNewPost = false;
-            }
-    }
-
-    private void ProgressBarSETUP() {
-        progressBarLoad.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 24));
-        progressBarLoad.setProgress(100);
-        progressBarLoad.setProgressDrawable(getResources().getDrawable(R.drawable.progress_horizontal_holo_light));
-        final FrameLayout decorView = (FrameLayout) getWindow().getDecorView();
-        decorView.addView(progressBarLoad);
-
-        ViewTreeObserver observer = progressBarLoad.getViewTreeObserver();
-        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                progressBarLoad.setY(getSupportActionBar().getHeight() + (float) Math.ceil(25 * getApplicationContext().getResources().getDisplayMetrics().density) - 10);
-
-                ViewTreeObserver observer = progressBarLoad.getViewTreeObserver();
-                observer.removeOnGlobalLayoutListener(this);
-            }
-        });
-    }
-
-    private void FloatingActionButtonSETUP() {
-        floatingActionButtonBACK.hide(false);
-        floatingActionButtonFORWARD.hide(false);
-        floatingActionButtonBACK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (webViewMain.canGoBack()) {
-                    progressBarLoad.setVisibility(View.VISIBLE);
-                    progressBarLoad.setProgress(0);
-                    webViewMain.goBack();
-                }
-            }
-        });
-        floatingActionButtonFORWARD.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (webViewMain.canGoForward()) {
-                    progressBarLoad.setVisibility(View.VISIBLE);
-                    progressBarLoad.setProgress(0);
-                    webViewMain.goForward();
-                }
-            }
-        });
+        if (booleanLoadNewPost) {
+            webFragment = new WebFragment();
+            webFragment.setArguments(getIntent().getExtras());
+            getFragmentManager().beginTransaction().add(R.id.frameLayout, webFragment, "WEB_FRAGMENT").commit();
+            activeTopicsFragment = new ActiveTopicsFragment();
+            activeTopicsFragment.setArguments(getIntent().getExtras());
+            getFragmentManager().beginTransaction().add(R.id.frameLayout, activeTopicsFragment, "ACTIVE_TOPICS_FRAGMENT").commit();
+            booleanLoadNewPost = false;
+        } else {
+            webFragment = new WebFragment();
+            webFragment.setArguments(getIntent().getExtras());
+            getFragmentManager().beginTransaction().add(R.id.frameLayout, webFragment, "WEB_FRAGMENT").commit();
+        }
     }
 
     private void DrawerSETUP() {
-        swipeRefreshLayout.setOnRefreshListener(this);
-        swipeRefreshLayout.setColorSchemeResources(
-                R.color.green, R.color.red);
-        String[] strings = getResources().getStringArray(R.array.drawer_list);
+        final String[] strings = getResources().getStringArray(R.array.drawer_list);
         itemsList.add(new Items(strings[0], R.drawable.ic_action_action_home_holo_light));
         itemsList.add(new Items(strings[1], R.drawable.ic_action_action_stars));
         itemsList.add(new Items(strings[2], R.drawable.ic_action_new));
@@ -384,35 +116,63 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
 
         mDrawerList.setAdapter(itemsArrayAdapter);
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 int editedPosition = position + 1;
                 if (editedPosition == 1) {
-                    LoadURL(mainUrl);
-                    booleanClearHistory = true;
-                    mDrawerLayout.closeDrawer(mDrawerList);
+                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null) {
+                        webFragment.LoadURL("http://android-forum.hu/index.php?mobile=mobile");
+                        webFragment.booleanClearHistory = true;
+                        mDrawerLayout.closeDrawer(mDrawerList);
+                    } else {
+                        getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
+                        webFragment.LoadURL("http://android-forum.hu/index.php?mobile=mobile");
+                        mDrawerLayout.closeDrawer(mDrawerList);
+                    }
                 }
                 if (editedPosition == 2) {
-                    Favourites();
-                    mDrawerLayout.closeDrawer(mDrawerList);
+                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null) {
+                        Favourites();
+                        mDrawerLayout.closeDrawer(mDrawerList);
+                    } else {
+                        getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
+                        getSupportActionBar().setTitle(webFragment.setTitleWebView());
+                        mDrawerLayout.closeDrawer(mDrawerList);
+                    }
                 }
                 if (editedPosition == 3) {
-                    LoadURL(newPostsUrl);
-                    mDrawerLayout.closeDrawer(mDrawerList);
+                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null) {
+                        getSupportActionBar().setTitle(strings[2]);
+                        mDrawerLayout.closeDrawer(mDrawerList);
+                        activeTopicsFragment = new ActiveTopicsFragment();
+                        getFragmentManager().beginTransaction().add(R.id.frameLayout, activeTopicsFragment, "ACTIVE_TOPICS_FRAGMENT").commit();
+                    } else {
+                        getSupportActionBar().setTitle(strings[2]);
+                        mDrawerLayout.closeDrawer(mDrawerList);
+                    }
                 }
                 if (editedPosition == 4) {
-                    LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unanswered");
-                    mDrawerLayout.closeDrawer(mDrawerList);
+                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null) {
+                        webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unanswered");
+                        mDrawerLayout.closeDrawer(mDrawerList);
+                    } else {
+                        getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
+                        webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unanswered");
+                        mDrawerLayout.closeDrawer(mDrawerList);
+                    }
                 }
                 if (editedPosition == 5) {
-                    LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unreadposts");
-                    mDrawerLayout.closeDrawer(mDrawerList);
+                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null) {
+                        webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unreadposts");
+                        mDrawerLayout.closeDrawer(mDrawerList);
+                    } else {
+                        getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
+                        webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unreadposts");
+                        mDrawerLayout.closeDrawer(mDrawerList);
+                    }
                 }
                 if (editedPosition == 6)
                     startActivity(new Intent(getApplicationContext(), Settings.class));
-
-
             }
         });
         mDrawerToggle = new ActionBarDrawerToggle(this,
@@ -424,15 +184,15 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 super.onDrawerSlide(drawerView, slideOffset);
-                swipeRefreshLayout.setEnabled(false);
-                floatingActionButtonBACK.hide();
-                floatingActionButtonFORWARD.hide();
+                webFragment.getSwipeRefreshLayout().setEnabled(false);
+                webFragment.getFloatingActionButtonBACK().hide();
+                webFragment.getFloatingActionButtonFORWARD().hide();
                 if (slideOffset == 0.0) {
-                    swipeRefreshLayout.setEnabled(true);
-                    if (webViewMain.canGoForward())
-                        floatingActionButtonFORWARD.show();
-                    if (webViewMain.canGoBack())
-                        floatingActionButtonBACK.show();
+                    webFragment.getSwipeRefreshLayout().setEnabled(true);
+                    if (webFragment.getWebViewMain().canGoForward())
+                        webFragment.getFloatingActionButtonFORWARD().show();
+                    if (webFragment.getWebViewMain().canGoBack())
+                        webFragment.getFloatingActionButtonBACK().show();
                 }
             }
 
@@ -440,8 +200,12 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                 super.onDrawerClosed(v);
                 invalidateOptionsMenu();
                 syncState();
-                swipeRefreshLayout.setEnabled(true);
-                getSupportActionBar().setTitle(titleWebView);
+                webFragment.getSwipeRefreshLayout().setEnabled(true);
+                if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null) {
+                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT").isVisible())
+                        getSupportActionBar().setTitle(strings[2]);
+                } else
+                    actionBar.setTitle(webFragment.setTitleWebView());
                 booleanMenu = true;
                 invalidateOptionsMenu();
             }
@@ -450,7 +214,7 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                 super.onDrawerOpened(v);
                 invalidateOptionsMenu();
                 syncState();
-                swipeRefreshLayout.setEnabled(false);
+                webFragment.getSwipeRefreshLayout().setEnabled(false);
                 getSupportActionBar().setTitle(R.string.NameApp);
                 booleanMenu = false;
                 invalidateOptionsMenu();
@@ -461,103 +225,108 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         mDrawerToggle.syncState();
+        actionBar = getSupportActionBar();
     }
 
     private void Favourites() {
         final Dialog dialog = new Dialog(Main.this);
-        dialog.setContentView(R.layout.activity_favourite_list);
+        dialog.setContentView(R.layout.main_favourite_list);
         dialog.setTitle(R.string.title_activity_favourites);
         final ListView listView = (ListView) dialog.findViewById(R.id.favouritesListView);
         final TextView textView = (TextView) dialog.findViewById(R.id.favouritesTextView);
         final String string = getSharedPreferences("FAVOURITES", MODE_PRIVATE).getString("Favourites", "");
         Log.i("FIRST_GET", "" + string);
-        if (!string.equals("")) {
-            listView.setVisibility(View.VISIBLE);
-            textView.setVisibility(View.INVISIBLE);
-            String[] strings = string.split("THIS_IS_THE_SPLIT");
-            final String[] name = {""};
-            final String[] link = {""};
-            for (String string1 : strings) {
-                String[] oneName = string1.split("THIS_IS_LINK_SPLIT");
-                name[0] += oneName[1];
-                link[0] += oneName[0];
-                name[0] += "THIS_IS_SECOND_SPLIT";
-                link[0] += "THIS_IS_SECOND_SPLIT";
+        if (string != null) {
+            if (!string.equals("")) {
+                listView.setVisibility(View.VISIBLE);
+                textView.setVisibility(View.INVISIBLE);
+                String[] strings = string.split("THIS_IS_THE_SPLIT");
+                final String[] name = {""};
+                final String[] link = {""};
+                for (String string1 : strings) {
+                    String[] oneName = string1.split("THIS_IS_LINK_SPLIT");
+                    name[0] += oneName[1];
+                    link[0] += oneName[0];
+                    name[0] += "THIS_IS_SECOND_SPLIT";
+                    link[0] += "THIS_IS_SECOND_SPLIT";
+                }
+                final String[] names = name[0].split("THIS_IS_SECOND_SPLIT");
+                final String[] links = link[0].split("THIS_IS_SECOND_SPLIT");
+                ArrayAdapter arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, names);
+                listView.setAdapter(arrayAdapter);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        dialog.dismiss();
+                        webFragment.LoadURL(links[position]);
+                    }
+                });
+                listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                        new AlertDialog.Builder(Main.this)
+                                .setMessage(getString(R.string.ListItemDelete) + names[position])
+                                .setCancelable(false)
+                                .setNegativeButton(R.string.No, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int which) {
+                                        dialogInterface.dismiss();
+                                    }
+                                })
+                                .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int which) {
+                                        links[position] = "";
+                                        names[position] = "";
+                                        String string = "";
+                                        for (int i = 0; i < links.length; i++) {
+                                            if (!links[i].equals("")) {
+                                                string += links[i];
+                                                string += "THIS_IS_LINK_SPLIT";
+                                            }
+                                            if (!names[i].equals("")) {
+                                                string += names[i];
+                                                string += "THIS_IS_THE_SPLIT";
+                                            }
+                                        }
+                                        getSharedPreferences("FAVOURITES", MODE_PRIVATE).edit().putString("Favourites", string).commit();
+                                        dialogInterface.dismiss();
+                                        final String stringTwo = getSharedPreferences("FAVOURITES", MODE_PRIVATE).getString("Favourites", "");
+                                        if (stringTwo != null) {
+                                            if (!stringTwo.equals("")) {
+                                                listView.setVisibility(View.VISIBLE);
+                                                textView.setVisibility(View.INVISIBLE);
+                                                String[] stringTwoArray = string.split("THIS_IS_THE_SPLIT");
+                                                name[0] = "";
+                                                link[0] = "";
+                                                for (String string1 : stringTwoArray) {
+                                                    String[] oneName = string1.split("THIS_IS_LINK_SPLIT");
+                                                    name[0] += oneName[1];
+                                                    link[0] += oneName[0];
+                                                    name[0] += "THIS_IS_SECOND_SPLIT";
+                                                    link[0] += "THIS_IS_SECOND_SPLIT";
+                                                }
+                                                final String[] names = name[0].split("THIS_IS_SECOND_SPLIT");
+                                                ArrayAdapter arrayAdapterTwo = new ArrayAdapter<>(Main.this, android.R.layout.simple_list_item_1, names);
+                                                listView.setAdapter(arrayAdapterTwo);
+                                            } else {
+                                                listView.setVisibility(View.INVISIBLE);
+                                                textView.setVisibility(View.VISIBLE);
+                                            }
+                                        }
+                                    }
+                                })
+                                .setTitle(R.string.Delete)
+                                .show();
+                        return true;
+                    }
+
+
+                });
+            } else {
+                listView.setVisibility(View.INVISIBLE);
+                textView.setVisibility(View.VISIBLE);
             }
-            final String[] names = name[0].split("THIS_IS_SECOND_SPLIT");
-            final String[] links = link[0].split("THIS_IS_SECOND_SPLIT");
-            ArrayAdapter arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, names);
-            listView.setAdapter(arrayAdapter);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    dialog.dismiss();
-                    LoadURL(links[position]);
-                }
-            });
-            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                @Override
-                public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-                    new AlertDialog.Builder(Main.this)
-                            .setMessage(getString(R.string.ListItemDelete) + names[position])
-                            .setCancelable(false)
-                            .setNegativeButton(R.string.No, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int which) {
-                                    dialogInterface.dismiss();
-                                }
-                            })
-                            .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int which) {
-                                    links[position] = "";
-                                    names[position] = "";
-                                    String string = "";
-                                    for (int i = 0; i < links.length; i++) {
-                                        if (!links[i].equals("")) {
-                                            string += links[i];
-                                            string += "THIS_IS_LINK_SPLIT";
-                                        }
-                                        if (!names[i].equals("")) {
-                                            string += names[i];
-                                            string += "THIS_IS_THE_SPLIT";
-                                        }
-                                    }
-                                    getSharedPreferences("FAVOURITES", MODE_PRIVATE).edit().putString("Favourites", string).commit();
-                                    dialogInterface.dismiss();
-                                    final String stringTwo = getSharedPreferences("FAVOURITES", MODE_PRIVATE).getString("Favourites", "");
-                                    if (!stringTwo.equals("")) {
-                                        listView.setVisibility(View.VISIBLE);
-                                        textView.setVisibility(View.INVISIBLE);
-                                        String[] stringTwoArray = string.split("THIS_IS_THE_SPLIT");
-                                        name[0] = "";
-                                        link[0] = "";
-                                        for (String string1 : stringTwoArray) {
-                                            String[] oneName = string1.split("THIS_IS_LINK_SPLIT");
-                                            name[0] += oneName[1];
-                                            link[0] += oneName[0];
-                                            name[0] += "THIS_IS_SECOND_SPLIT";
-                                            link[0] += "THIS_IS_SECOND_SPLIT";
-                                        }
-                                        final String[] names = name[0].split("THIS_IS_SECOND_SPLIT");
-                                        ArrayAdapter arrayAdapterTwo = new ArrayAdapter<>(Main.this, android.R.layout.simple_list_item_1, names);
-                                        listView.setAdapter(arrayAdapterTwo);
-                                    } else {
-                                        listView.setVisibility(View.INVISIBLE);
-                                        textView.setVisibility(View.VISIBLE);
-                                    }
-                                }
-                            })
-                            .setTitle(R.string.Delete)
-                            .show();
-                    return true;
-                }
-
-
-            });
-        } else {
-            listView.setVisibility(View.INVISIBLE);
-            textView.setVisibility(View.VISIBLE);
         }
         dialog.setCancelable(true);
 
@@ -566,31 +335,47 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
 
     @Override
     public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
-        if ((keyCode == KeyEvent.KEYCODE_BACK))
-            if (mDrawerLayout.isDrawerOpen(mDrawerList))
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
                 mDrawerLayout.closeDrawer(mDrawerList);
-        if ((keyCode == KeyEvent.KEYCODE_BACK) && webViewMain.canGoBack() && !mDrawerLayout.isDrawerOpen(mDrawerList)) {
-            progressBarLoad.setVisibility(View.VISIBLE);
-            progressBarLoad.setProgress(0);
-            webViewMain.goBack();
-            return true;
+                return true;
+            }
+            if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null)
+                if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT").isVisible()) {
+                    getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
+                    getSupportActionBar().setTitle(webFragment.setTitleWebView());
+                    return true;
+                }
+            if (getFragmentManager().findFragmentByTag("WEB_FRAGMENT").isVisible()) {
+                if (webFragment.getWebViewMain().canGoBack()) {
+                    webFragment.getProgressBarLoad().setVisibility(View.VISIBLE);
+                    webFragment.getProgressBarLoad().setProgress(0);
+                    webFragment.getWebViewMain().goBack();
+                    return true;
+                }
+                if (!webFragment.getWebViewMain().canGoBack()) {
+                    if (booleanOnKeyDown) {
+                        new AlertDialog.Builder(this)
+                                .setTitle(getString(R.string.SureExitTitle))
+                                .setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        finish();
+                                    }
+                                })
+                                .setNegativeButton(getString(R.string.No), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                }).show();
+                        return true;
+                    } else {
+                        finish();
+                    }
+                }
+            }
         }
-        if ((keyCode == KeyEvent.KEYCODE_BACK) && !webViewMain.canGoBack() && !mDrawerLayout.isDrawerOpen(mDrawerList))
-            if (booleanOnKeyDown)
-                new AlertDialog.Builder(this)
-                        .setTitle(getString(R.string.SureExitTitle))
-                        .setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                finish();
-                            }
-                        })
-                        .setNegativeButton(getString(R.string.No), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        }).show();
-            else finish();
-
         return true;
     }
 
@@ -641,7 +426,7 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
             @Override
             public void onClick(View v) {
                 String string = getSharedPreferences("FAVOURITES", MODE_PRIVATE).getString("Favourites", "");
-                string += webViewMain.getUrl();
+                string += webFragment.getWebViewMain().getUrl();
                 string += "THIS_IS_LINK_SPLIT";
                 string += editText.getText().toString();
                 string += "THIS_IS_THE_SPLIT";
@@ -674,90 +459,10 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
         }
         if (key.equals("OnKeyDown"))
             booleanOnKeyDown = sharedPreferences.getBoolean(key, true);
-        if (key.equals("Screen"))
-            if (sharedPreferences.getBoolean(key, false))
-                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         if (key.equals("BasicZoom"))
-            webViewMain.getSettings().setTextZoom(Integer.parseInt(sharedPreferences.getString(key, "100")));
+            webFragment.getWebViewMain().getSettings().setTextZoom(Integer.parseInt(sharedPreferences.getString(key, "100")));
         if (key.equals("Zoom"))
-            webViewMain.getSettings().setBuiltInZoomControls(sharedPreferences.getBoolean(key, false));
-    }
-
-    private void InitializeParse() {
-        ParseInstallation.getCurrentInstallation().saveInBackground();
-        ParseAnalytics.trackAppOpenedInBackground(getIntent());
-        Parse.setLogLevel(Parse.LOG_LEVEL_INFO);
-        if (!getSharedPreferences("PARSE_EVERYBODY", MODE_PRIVATE).getBoolean("ParseEveryBody", false))
-            ParsePush.subscribeInBackground("everyBody", new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e == null) {
-                        getSharedPreferences("PARSE_EVERYBODY", MODE_PRIVATE)
-                                .edit()
-                                .putBoolean("ParseEveryBody", true)
-                                .commit();
-                    } else {
-                        getSharedPreferences("PARSE_EVERYBODY", MODE_PRIVATE)
-                                .edit()
-                                .putBoolean("ParseEveryBody", false)
-                                .commit();
-                    }
-                }
-            });
-    }
-
-    private void getSettings(SharedPreferences sharedPreferences) {
-        webViewMain.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-        webViewMain.getSettings().setLoadsImagesAutomatically(true);
-        webViewMain.getSettings().setLoadWithOverviewMode(true);
-        webViewMain.getSettings().setUseWideViewPort(true);
-        webViewMain.requestFocusFromTouch();
-        webViewMain.getSettings().setJavaScriptEnabled(true);
-        webViewMain.setFitsSystemWindows(true);
-        webViewMain.getSettings().setDisplayZoomControls(false);
-        webViewMain.getSettings().setBuiltInZoomControls(sharedPreferences.getBoolean("Zoom", false));
-        webViewMain.getSettings().setTextZoom(Integer.parseInt(sharedPreferences.getString("BasicZoom", "100")));
-        booleanOnKeyDown = sharedPreferences.getBoolean("OnKeyDown", true);
-        if (sharedPreferences.getBoolean("Screen", false))
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    }
-
-    private void LoadURL(String aURL) {
-        progressBarLoad.setVisibility(View.VISIBLE);
-        progressBarLoad.setProgress(0);
-        webViewMain.loadUrl(aURL);
-    }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        webViewMain.saveState(outState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        webViewMain.restoreState(savedInstanceState);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    }
-
-    @Override
-    public void onRefresh() {
-        if (booleanFailedLoadURL) {
-            LoadURL(stringFailingURL);
-            booleanFailedLoadURL = false;
-            booleanReloadSwipe = true;
-        } else {
-            LoadURL(webViewMain.getUrl());
-            booleanReloadSwipe = true;
-        }
+            webFragment.getWebViewMain().getSettings().setBuiltInZoomControls(sharedPreferences.getBoolean(key, false));
     }
 
     @Override
@@ -771,6 +476,16 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public int getActionBarSize() {
+        return actionBar.getHeight();
+    }
+
+    @Override
+    public void setActionBarTitle(String title) {
+        actionBar.setTitle(title);
     }
 
     public class ListViewAdapter extends ArrayAdapter<Items> {

@@ -1,4 +1,4 @@
-package hu.zokni1996.android_forum.Service;
+package hu.zokni1996.android_forum.Main.Service;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

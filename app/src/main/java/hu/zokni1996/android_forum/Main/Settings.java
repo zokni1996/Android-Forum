@@ -47,7 +47,7 @@ import java.util.Locale;
 
 import hu.zokni1996.android_forum.R;
 
-public class Settings extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class Settings extends PreferenceActivity {
 
     static String changeLogHun = "";
     static String changeLogEng = "";
@@ -60,7 +60,6 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
             setTheme(android.R.style.Theme_Material_Light);
         else setTheme(R.style.StyleThemeSettings);
 
-        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
         actionBar = getActionBar();
         if (actionBar != null)
             actionBar.setIcon(R.drawable.ic_action_action_settings_holo_light);
@@ -83,30 +82,6 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
                 header.iconRes = R.drawable.ic_action_alerts_and_states_error_holo_light;
             if (header.titleRes == R.string.ParseSettingsNotificationName)
                 header.iconRes = R.drawable.ic_action_action_lock_holo_light;
-        }
-    }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getBoolean("Screen", false))
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("Screen")) {
-            if (sharedPreferences.getBoolean(key, false))
-                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
     }
 

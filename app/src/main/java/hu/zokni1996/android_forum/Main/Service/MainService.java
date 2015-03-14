@@ -1,4 +1,4 @@
-package hu.zokni1996.android_forum.Service;
+package hu.zokni1996.android_forum.Main.Service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -122,7 +122,7 @@ public class MainService extends Service {
 
     private String getString(String[] CONTENT_ARRAY_TO_UPDATED_TIME) {
         /* Get the time from the content, that we will compare the saved time */
-        String updatedString = " •";
+        String updatedString = " \u2022";
         for (String aContentArray : CONTENT_ARRAY_TO_UPDATED_TIME) {
             boolean you = true;
             int j = 0;
@@ -139,7 +139,7 @@ public class MainService extends Service {
                                             updatedString += aContentArray.charAt(a);
                                             a++;
                                             if (aContentArray.charAt(a) == '<') {
-                                                updatedString += "THIS_IS_THE_SPLIT •";
+                                                updatedString += "THIS_IS_THE_SPLIT \u2022";
                                                 there = false;
                                                 you = false;
                                             }
@@ -159,12 +159,12 @@ public class MainService extends Service {
     }
 
     private void NotificationStyleInt1(String[] titleArray, String[] updatedArray) throws Exception {
-        String topicNameString = "• ";
+        String topicNameString = "\u2022 ";
         for (String aNewPostsArray : titleArray) {
             boolean you = true;
             int j = 0;
             while (you) {
-                if (aNewPostsArray.charAt(j) == '•') {
+                if (aNewPostsArray.charAt(j) == '\u2022') {
                     boolean there = true;
                     int a = j + 1;
                     while (there) {
@@ -174,8 +174,8 @@ public class MainService extends Service {
                             you = false;
                             break;
                         }
-                        if (aNewPostsArray.charAt(a) == '•') {
-                            topicNameString += "THIS_IS_THE_SPLIT•";
+                        if (aNewPostsArray.charAt(a) == '\u2022') {
+                            topicNameString += "THIS_IS_THE_SPLIT\u2022";
                             there = false;
                             you = false;
                         }
@@ -193,17 +193,17 @@ public class MainService extends Service {
     }
 
     private void NotificationStyleInt2(String[] titleArray, String[] updatedArray) throws Exception {
-        String forumString = "•";
+        String forumString = "\u2022";
         for (String aNewPostsArray : titleArray) {
             boolean you = true;
             int j = 0;
             while (you) {
-                if (aNewPostsArray.charAt(j) == '•') {
+                if (aNewPostsArray.charAt(j) == '\u2022') {
                     boolean you2 = true;
                     int k = j;
                     k++;
                     while (you2) {
-                        if (aNewPostsArray.charAt(k) == '•') {
+                        if (aNewPostsArray.charAt(k) == '\u2022') {
                             int a = k + 1;
                             while (true) {
                                 forumString += aNewPostsArray.charAt(a);
@@ -211,7 +211,7 @@ public class MainService extends Service {
                                 if (a == aNewPostsArray.length()) {
                                     you = false;
                                     you2 = false;
-                                    forumString += "THIS_IS_THE_SPLIT•";
+                                    forumString += "THIS_IS_THE_SPLIT\u2022";
                                     break;
                                 }
                             }
@@ -271,13 +271,15 @@ public class MainService extends Service {
         }
     }
 
-    private class DownloadXmlTask extends AsyncTask<String, Void, Void> {
-        String stringUPDATED = "";
-        String contentSTRING = "";
-        String titleSTRING = "";
+    private class DownloadXmlTask extends AsyncTask<String, Void, String> {
+
+        String[] strings = new String[3];
 
         @Override
-        protected Void doInBackground(String... urls) {
+        protected String doInBackground(String... urls) {
+            String back = "+";
+            for (int i = 0; i < strings.length; i++)
+                strings[i] = "";
             try {
                 Document document = Jsoup.connect("http://android-forum.hu/feed.php").timeout(10000).get();
                 Elements updated = document.select("updated");
@@ -289,43 +291,47 @@ public class MainService extends Service {
                     for (int j = 0; j < title.size(); j++) {
                         Elements titleAttr = title.get(j).getElementsByAttributeValueContaining("type", "html");
                         for (int l = 0; l < titleAttr.size(); l++) {
-                            titleSTRING += "• ";
-                            titleSTRING += titleAttr.get(l).text().replace("<![CDATA[", "").replace("]]>", "");
-                            titleSTRING += "THIS_IS_THE_SPLIT";
+                            strings[0] += "\u2022 ";
+                            strings[0] += titleAttr.get(l).text().replace("<![CDATA[", "").replace("]]>", "");
+                            strings[0] += "THIS_IS_THE_SPLIT";
                         }
                     }
                     /* Get all the contents*/
                     Elements content = entry.get(i).select("content");
                     for (int j = 0; j < content.size(); j++) {
-                        contentSTRING += content.get(j).text().replace("<![CDATA[", "]]>").replace("]]>", "");
-                        contentSTRING += "THIS_IS_THE_SPLIT";
+                        strings[1] += content.get(j).text().replace("<![CDATA[", "]]>").replace("]]>", "");
+                        strings[1] += "THIS_IS_THE_SPLIT";
                     }
                 }
                 /* Get the latest post time */
-                stringUPDATED = updated.get(0).text();
+                strings[2] = updated.get(0).text();
             } catch (IOException e) {
+                back = "-";
                 parseError.sendError("MainService.java", "DOWNLOAD_FEED", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
             }
-            return null;
+            return back;
         }
 
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            getSettings();
+        protected void onPostExecute(String back) {
+            super.onPostExecute(back);
+            if (back.equals("+")) {
+                getSettings();
             /* Get the saved time */
-            String stringSAVED = getSharedPreferences("LAST_UPDATED", MODE_PRIVATE).getString("LastUpdated", "");
+                String stringSAVED = getSharedPreferences("LAST_UPDATED", MODE_PRIVATE).getString("LastUpdated", "");
             /*  If the data got successfully, save the time */
-            if (stringUPDATED.length() > 0 && !stringUPDATED.equals(stringSAVED) && contentSTRING.length() > 0 && titleSTRING.length() > 0) {
-                getSharedPreferences("LAST_UPDATED", MODE_PRIVATE)
-                        .edit()
-                        .putString("LastUpdated", stringUPDATED)
-                        .commit();
+                if (strings[2].length() > 0 && !strings[2].equals(stringSAVED) && strings[1].length() > 0 && strings[0].length() > 0) {
+                    getSharedPreferences("LAST_UPDATED", MODE_PRIVATE)
+                            .edit()
+                            .putString("LastUpdated", strings[2])
+                            .commit();
                 /* If the saved time > 0, then make the notification */
-                if (stringSAVED.length() > 0)
-                    NotificationMethod(NotificationPriorityInt, contentSTRING, titleSTRING);
-
+                    if (stringSAVED != null) {
+                        if (stringSAVED.length() > 0)
+                            NotificationMethod(NotificationPriorityInt, strings[1], strings[0]);
+                    }
+                }
             }
         }
     }

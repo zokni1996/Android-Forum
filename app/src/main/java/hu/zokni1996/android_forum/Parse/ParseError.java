@@ -33,7 +33,7 @@ public class ParseError {
         error.saveEventually();
     }
 
-    public String GetDeviceName() {
+    private String GetDeviceName() {
         String manufacturer = Build.MANUFACTURER;
         String model = Build.MODEL;
         if (model.startsWith(manufacturer)) {

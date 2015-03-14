@@ -34,6 +34,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".Main.ActiveTopics.ActiveTopicsFragment"
+            android:theme="@android:style/Theme.Holo.Light"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/NameApp"
+            android:launchMode="singleTop"/>
         <activity
             android:name=".Main.Main"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -45,11 +50,11 @@
             android:label="@string/NameSettings" />
 
         <service
-            android:name=".Service.MainService"
+            android:name=".Main.Service.MainService"
             android:enabled="true"
             android:exported="false" />
 
-        <receiver android:name=".Service.MainReceiver">
+        <receiver android:name=".Main.Service.MainReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="startServiceAndroidForum" />

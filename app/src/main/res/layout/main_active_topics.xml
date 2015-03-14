@@ -1,0 +1,64 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    tools:context=".MyActivity">
+
+    <ProgressBar
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBarActiveTopics"
+        android:layout_gravity="center_horizontal" />
+
+    <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_viewActiveTopicsFailed"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        card_view:cardCornerRadius="4dp"
+        android:layout_height="50dp"
+        android:layout_margin="4dp"
+        card_view:cardBackgroundColor="@color/accent_material_light">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.CardView
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                card_view:cardCornerRadius="4dp"
+                android:layout_height="fill_parent"
+                android:layout_margin="4dp"
+                card_view:cardBackgroundColor="@color/button_material_light">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@color/button_material_light">
+
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@string/FailedLoadURL"
+                        android:gravity="center_horizontal"
+                        android:id="@+id/textViewWhatWrite" />
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/cardList"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="gone" />
+</LinearLayout>
