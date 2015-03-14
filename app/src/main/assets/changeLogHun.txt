@@ -40,3 +40,8 @@
 • Új alkalmazás ikon <br />
 • Néhány Layout kijavítva <br />
 • Az értesítésben ha szeretnéd, akkor csak az utolsó téma jelenik meg, amibe a hozzászólás érkezett meg <br />
+<hr /><span style="font-size: 125%; line-height: 116%;"><span style="font-weight: bold"><div style="text-align: center;">• 2.2.1 •</div></span></span><br />
+• Újabb hibajavítások<br />
+• Fragmentek használata<br />
+• CardView! --> jelenleg csak az atív témáknál<br />
+• Törölve sok felesleges sor kód<br />

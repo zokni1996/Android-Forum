@@ -42,3 +42,8 @@
 • New application icon <br />
 • Layout bugs fixes <br />
 • Show the last topic, who's get the last post<br />
+<hr /><span style="font-size: 125%; line-height: 116%;"><span style="font-weight: bold"><div style="text-align: center;">• 2.2.1 •</div></span></span><br />
+• A lot of bug fixes<br />
+• Now I use fragments<br />
+• CardView! --> only the active topics (YET)<br />
+• Deleted a lot of unnecessary lines...<br />
