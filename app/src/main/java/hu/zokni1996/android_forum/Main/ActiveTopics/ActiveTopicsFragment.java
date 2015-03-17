@@ -46,12 +46,13 @@ public class ActiveTopicsFragment extends Fragment {
         return view;
     }
 
-    private class DataForum extends AsyncTask<String, Void, String> {
-        String[] strings = new String[4];
+    private class DataForum extends AsyncTask<String, Void, String[]> {
+
+        IOException ioException;
 
         @Override
-        protected String doInBackground(String... params) {
-            String back = "+";
+        protected String[] doInBackground(String... params) {
+            String[] strings = new String[4];
             for (int i = 0; i < strings.length; i++)
                 strings[i] = "";
             try {
@@ -101,15 +102,15 @@ public class ActiveTopicsFragment extends Fragment {
                 }
             } catch (IOException e) {
                 Log.i("doInBackground", "" + e);
-                back = "-";
+                ioException = e;
             }
-            return back;
+            return strings;
         }
 
         @Override
-        protected void onPostExecute(String back) {
+        protected void onPostExecute(String[] strings) {
             progressBar.setVisibility(View.GONE);
-            if (back.equals("+")) {
+            if (ioException == null) {
                 cardView.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
                 List<ItemAdapter> list = new ArrayList<>();
@@ -136,7 +137,7 @@ public class ActiveTopicsFragment extends Fragment {
                 recyclerView.setVisibility(View.GONE);
                 cardView.setVisibility(View.VISIBLE);
             }
-            super.onPostExecute(back);
+            super.onPostExecute(strings);
         }
     }
 

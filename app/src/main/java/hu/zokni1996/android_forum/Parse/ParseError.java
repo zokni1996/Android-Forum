@@ -10,16 +10,14 @@ public class ParseError {
     String tag;
     String e;
     String cause;
-    String localiseMessage;
     String message;
 
 
-    public void sendError(String activity, String tag, String e, String cause, String localiseMessage, String message) {
+    public void sendError(String activity, String tag, String e, String cause, String message) {
         this.activity = activity;
         this.tag = tag;
         this.e = e;
         this.cause = cause;
-        this.localiseMessage = localiseMessage;
         this.message = message;
         ParseObject error = new ParseObject("Error");
         error.put("DeviceName", GetDeviceName());
@@ -28,7 +26,6 @@ public class ParseError {
         error.put("TAG", tag);
         error.put("Activity", activity);
         error.put("Cause", cause);
-        error.put("LocaliseMessage", localiseMessage);
         error.put("Message", message);
         error.saveEventually();
     }

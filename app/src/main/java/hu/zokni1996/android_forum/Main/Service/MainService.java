@@ -90,25 +90,25 @@ public class MainService extends Service {
             try {
                 NotificationStyleInt1(titleArray, updatedArray);
             } catch (Exception e) {
-                parseError.sendError("MainService.class", "NotificationStyleInt 1", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
+                parseError.sendError("MainService.class", "NotificationStyleInt 1", "" + e, e.getCause().toString(), e.getMessage());
             }
         if (NotificationStyleInt == 2)
             try {
                 NotificationStyleInt2(titleArray, updatedArray);
             } catch (Exception e) {
-                parseError.sendError("MainService.class", "NotificationStyleInt 2", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
+                parseError.sendError("MainService.class", "NotificationStyleInt 2", "" + e, e.getCause().toString(), e.getMessage());
             }
         if (NotificationStyleInt == 3)
             try {
                 NotificationStyleInt3(titleArray);
             } catch (Exception e) {
-                parseError.sendError("MainService.class", "NotificationStyleInt 3", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
+                parseError.sendError("MainService.class", "NotificationStyleInt 3", "" + e, e.getCause().toString(), e.getMessage());
             }
         if (NotificationStyleInt == 4)
             try {
                 NotificationStyleInt4(titleArray, updatedArray);
             } catch (Exception e) {
-                parseError.sendError("MainService.class", "NotificationStyleInt 4", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
+                parseError.sendError("MainService.class", "NotificationStyleInt 4", "" + e, e.getCause().toString(), e.getMessage());
             }
         mBuilder.setStyle(inboxStyle);
         mBuilder.build();
@@ -257,27 +257,27 @@ public class MainService extends Service {
                     try {
                         sleep(timeCheck);
                     } catch (InterruptedException e) {
-                        parseError.sendError("MainService.class", "The sleep interrupted:", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
+                        parseError.sendError("MainService.class", "The sleep interrupted:", "" + e, e.getCause().toString(), e.getMessage());
                     }
                 } else {
                     getSettings();
                     try {
                         sleep(timeCheck);
                     } catch (InterruptedException e) {
-                        parseError.sendError("MainService.class", "The sleep interrupted:", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
+                        parseError.sendError("MainService.class", "The sleep interrupted:", "" + e, e.getCause().toString(), e.getMessage());
                     }
                 }
             }
         }
     }
 
-    private class DownloadXmlTask extends AsyncTask<String, Void, String> {
+    private class DownloadXmlTask extends AsyncTask<String, Void, String[]> {
 
-        String[] strings = new String[3];
+        IOException ioException;
 
         @Override
-        protected String doInBackground(String... urls) {
-            String back = "+";
+        protected String[] doInBackground(String... urls) {
+            String[] strings = new String[3];
             for (int i = 0; i < strings.length; i++)
                 strings[i] = "";
             try {
@@ -306,17 +306,17 @@ public class MainService extends Service {
                 /* Get the latest post time */
                 strings[2] = updated.get(0).text();
             } catch (IOException e) {
-                back = "-";
-                parseError.sendError("MainService.java", "DOWNLOAD_FEED", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
+                parseError.sendError("MainService.java", "DOWNLOAD_FEED", "" + e, e.getCause().toString(), e.getMessage());
+                ioException = e;
             }
-            return back;
+            return strings;
         }
 
 
         @Override
-        protected void onPostExecute(String back) {
-            super.onPostExecute(back);
-            if (back.equals("+")) {
+        protected void onPostExecute(String[] strings) {
+            super.onPostExecute(strings);
+            if (ioException == null) {
                 getSettings();
             /* Get the saved time */
                 String stringSAVED = getSharedPreferences("LAST_UPDATED", MODE_PRIVATE).getString("LastUpdated", "");

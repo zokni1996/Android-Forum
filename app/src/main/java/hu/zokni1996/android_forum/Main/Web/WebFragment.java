@@ -132,7 +132,7 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                             handler.useHttpAuthUsernamePassword();
                             dialog.dismiss();
                         } catch (Exception e) {
-                            parseError.sendError("Main.java", "AUTH_USERNAME_PASSWORD", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
+                            parseError.sendError("Main.java", "AUTH_USERNAME_PASSWORD", "" + e, e.getCause().toString(), e.getMessage());
                         }
                     }
                 });
@@ -158,7 +158,7 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                         booleanFailedLoadURL = true;
                         input.close();
                     } catch (IOException e) {
-                        parseError.sendError("Main.java", "OnReceivedError", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
+                        parseError.sendError("Main.java", "OnReceivedError", "" + e, e.getCause().toString(), e.getMessage());
                     }
                     view.loadDataWithBaseURL(null, stringFailedLoadPage[0], "text/html; charset=utf-8", "UTF-8",
                             null);
@@ -236,7 +236,7 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                     titleWebView = titleTwo;
                 } catch (Exception e) {
                     webFragmentWebClicked.setActionBarTitle(stringTitle);
-                    parseError.sendError("Main.class", "setTitleError", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
+                    parseError.sendError("Main.class", "setTitleError", "" + e, e.getCause().toString(), e.getMessage());
                     titleWebView = stringTitle;
                 }
                 if (booleanFailedLoadURL) {

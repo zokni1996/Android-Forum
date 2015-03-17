@@ -1,8 +1,6 @@
 package hu.zokni1996.android_forum.Main;
 
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,9 +15,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,16 +22,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.afollestad.materialdialogs.AlertDialogWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import hu.zokni1996.android_forum.Favourites.AddToFavourite;
+import hu.zokni1996.android_forum.Favourites.GetFavourites;
 import hu.zokni1996.android_forum.Items.Items;
 import hu.zokni1996.android_forum.Main.ActiveTopics.ActiveTopicsFragment;
 import hu.zokni1996.android_forum.Main.Web.WebFragment;
@@ -55,6 +51,7 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
     ActiveTopicsFragment activeTopicsFragment;
     ActionBar actionBar;
     boolean booleanLoadNewPost = false;
+    boolean booleanFavourites = false;
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -121,10 +118,14 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                 int editedPosition = position + 1;
                 if (editedPosition == 1) {
                     if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null) {
+                        booleanMenu = true;
+                        invalidateOptionsMenu();
                         webFragment.LoadURL("http://android-forum.hu/index.php?mobile=mobile");
                         webFragment.booleanClearHistory = true;
                         mDrawerLayout.closeDrawer(mDrawerList);
                     } else {
+                        booleanMenu = true;
+                        invalidateOptionsMenu();
                         getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
                         webFragment.LoadURL("http://android-forum.hu/index.php?mobile=mobile");
                         mDrawerLayout.closeDrawer(mDrawerList);
@@ -132,9 +133,12 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                 }
                 if (editedPosition == 2) {
                     if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null) {
-                        Favourites();
+                        booleanFavourites = true;
                         mDrawerLayout.closeDrawer(mDrawerList);
                     } else {
+                        booleanFavourites = true;
+                        booleanMenu = true;
+                        invalidateOptionsMenu();
                         getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
                         getSupportActionBar().setTitle(webFragment.setTitleWebView());
                         mDrawerLayout.closeDrawer(mDrawerList);
@@ -145,17 +149,25 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                         getSupportActionBar().setTitle(strings[2]);
                         mDrawerLayout.closeDrawer(mDrawerList);
                         activeTopicsFragment = new ActiveTopicsFragment();
+                        booleanMenu = false;
+                        invalidateOptionsMenu();
                         getFragmentManager().beginTransaction().add(R.id.frameLayout, activeTopicsFragment, "ACTIVE_TOPICS_FRAGMENT").commit();
                     } else {
+                        booleanMenu = false;
+                        invalidateOptionsMenu();
                         getSupportActionBar().setTitle(strings[2]);
                         mDrawerLayout.closeDrawer(mDrawerList);
                     }
                 }
                 if (editedPosition == 4) {
                     if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null) {
+                        booleanMenu = true;
+                        invalidateOptionsMenu();
                         webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unanswered");
                         mDrawerLayout.closeDrawer(mDrawerList);
                     } else {
+                        booleanMenu = true;
+                        invalidateOptionsMenu();
                         getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
                         webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unanswered");
                         mDrawerLayout.closeDrawer(mDrawerList);
@@ -163,9 +175,13 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                 }
                 if (editedPosition == 5) {
                     if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null) {
+                        booleanMenu = true;
+                        invalidateOptionsMenu();
                         webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unreadposts");
                         mDrawerLayout.closeDrawer(mDrawerList);
                     } else {
+                        booleanMenu = true;
+                        invalidateOptionsMenu();
                         getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
                         webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unreadposts");
                         mDrawerLayout.closeDrawer(mDrawerList);
@@ -200,13 +216,19 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                 super.onDrawerClosed(v);
                 invalidateOptionsMenu();
                 syncState();
+                if (booleanFavourites)
+                    new GetFavourites(Main.this);
+                booleanFavourites = false;
                 webFragment.getSwipeRefreshLayout().setEnabled(true);
                 if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null) {
                     if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT").isVisible())
                         getSupportActionBar().setTitle(strings[2]);
                 } else
                     actionBar.setTitle(webFragment.setTitleWebView());
-                booleanMenu = true;
+                if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null)
+                    booleanMenu = true;
+                else
+                    booleanLoadNewPost = false;
                 invalidateOptionsMenu();
             }
 
@@ -226,111 +248,6 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
         getSupportActionBar().setHomeButtonEnabled(true);
         mDrawerToggle.syncState();
         actionBar = getSupportActionBar();
-    }
-
-    private void Favourites() {
-        final Dialog dialog = new Dialog(Main.this);
-        dialog.setContentView(R.layout.main_favourite_list);
-        dialog.setTitle(R.string.title_activity_favourites);
-        final ListView listView = (ListView) dialog.findViewById(R.id.favouritesListView);
-        final TextView textView = (TextView) dialog.findViewById(R.id.favouritesTextView);
-        final String string = getSharedPreferences("FAVOURITES", MODE_PRIVATE).getString("Favourites", "");
-        Log.i("FIRST_GET", "" + string);
-        if (string != null) {
-            if (!string.equals("")) {
-                listView.setVisibility(View.VISIBLE);
-                textView.setVisibility(View.INVISIBLE);
-                String[] strings = string.split("THIS_IS_THE_SPLIT");
-                final String[] name = {""};
-                final String[] link = {""};
-                for (String string1 : strings) {
-                    String[] oneName = string1.split("THIS_IS_LINK_SPLIT");
-                    name[0] += oneName[1];
-                    link[0] += oneName[0];
-                    name[0] += "THIS_IS_SECOND_SPLIT";
-                    link[0] += "THIS_IS_SECOND_SPLIT";
-                }
-                final String[] names = name[0].split("THIS_IS_SECOND_SPLIT");
-                final String[] links = link[0].split("THIS_IS_SECOND_SPLIT");
-                ArrayAdapter arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, names);
-                listView.setAdapter(arrayAdapter);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        dialog.dismiss();
-                        webFragment.LoadURL(links[position]);
-                    }
-                });
-                listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                    @Override
-                    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-                        new AlertDialog.Builder(Main.this)
-                                .setMessage(getString(R.string.ListItemDelete) + names[position])
-                                .setCancelable(false)
-                                .setNegativeButton(R.string.No, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int which) {
-                                        dialogInterface.dismiss();
-                                    }
-                                })
-                                .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int which) {
-                                        links[position] = "";
-                                        names[position] = "";
-                                        String string = "";
-                                        for (int i = 0; i < links.length; i++) {
-                                            if (!links[i].equals("")) {
-                                                string += links[i];
-                                                string += "THIS_IS_LINK_SPLIT";
-                                            }
-                                            if (!names[i].equals("")) {
-                                                string += names[i];
-                                                string += "THIS_IS_THE_SPLIT";
-                                            }
-                                        }
-                                        getSharedPreferences("FAVOURITES", MODE_PRIVATE).edit().putString("Favourites", string).commit();
-                                        dialogInterface.dismiss();
-                                        final String stringTwo = getSharedPreferences("FAVOURITES", MODE_PRIVATE).getString("Favourites", "");
-                                        if (stringTwo != null) {
-                                            if (!stringTwo.equals("")) {
-                                                listView.setVisibility(View.VISIBLE);
-                                                textView.setVisibility(View.INVISIBLE);
-                                                String[] stringTwoArray = string.split("THIS_IS_THE_SPLIT");
-                                                name[0] = "";
-                                                link[0] = "";
-                                                for (String string1 : stringTwoArray) {
-                                                    String[] oneName = string1.split("THIS_IS_LINK_SPLIT");
-                                                    name[0] += oneName[1];
-                                                    link[0] += oneName[0];
-                                                    name[0] += "THIS_IS_SECOND_SPLIT";
-                                                    link[0] += "THIS_IS_SECOND_SPLIT";
-                                                }
-                                                final String[] names = name[0].split("THIS_IS_SECOND_SPLIT");
-                                                ArrayAdapter arrayAdapterTwo = new ArrayAdapter<>(Main.this, android.R.layout.simple_list_item_1, names);
-                                                listView.setAdapter(arrayAdapterTwo);
-                                            } else {
-                                                listView.setVisibility(View.INVISIBLE);
-                                                textView.setVisibility(View.VISIBLE);
-                                            }
-                                        }
-                                    }
-                                })
-                                .setTitle(R.string.Delete)
-                                .show();
-                        return true;
-                    }
-
-
-                });
-            } else {
-                listView.setVisibility(View.INVISIBLE);
-                textView.setVisibility(View.VISIBLE);
-            }
-        }
-        dialog.setCancelable(true);
-
-        dialog.show();
     }
 
     @Override
@@ -355,7 +272,7 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                 }
                 if (!webFragment.getWebViewMain().canGoBack()) {
                     if (booleanOnKeyDown) {
-                        new AlertDialog.Builder(this)
+                        new AlertDialogWrapper.Builder(this)
                                 .setTitle(getString(R.string.SureExitTitle))
                                 .setPositiveButton(getString(R.string.Yes), new DialogInterface.OnClickListener() {
                                     @Override
@@ -390,52 +307,10 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
             }
             break;
             case R.id.favouriteMenu:
-                AddToFavourite();
+                new AddToFavourite(webFragment.getWebViewMain().getUrl(), this);
                 break;
         }
         return true;
-    }
-
-    private void AddToFavourite() {
-        final Dialog dialog = new Dialog(Main.this);
-        dialog.setContentView(R.layout.main_add_favourite);
-        dialog.setTitle(getString(R.string.AddFavourite));
-
-        final EditText editText = (EditText) dialog.findViewById(R.id.editTextFavouriteName);
-        final Button buttonSAVE = (Button) dialog.findViewById(R.id.buttonSaveFavourite);
-        buttonSAVE.setEnabled(false);
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s == null || s.length() == 0)
-                    buttonSAVE.setEnabled(false);
-                else buttonSAVE.setEnabled(true);
-            }
-        });
-        buttonSAVE.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String string = getSharedPreferences("FAVOURITES", MODE_PRIVATE).getString("Favourites", "");
-                string += webFragment.getWebViewMain().getUrl();
-                string += "THIS_IS_LINK_SPLIT";
-                string += editText.getText().toString();
-                string += "THIS_IS_THE_SPLIT";
-                getSharedPreferences("FAVOURITES", MODE_PRIVATE).edit().putString("Favourites", string).commit();
-                dialog.dismiss();
-                Toast.makeText(Main.this, getString(R.string.SavedSuccessFully), Toast.LENGTH_SHORT).show();
-            }
-        });
-        dialog.show();
     }
 
     @Override

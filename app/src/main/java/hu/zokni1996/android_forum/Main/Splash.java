@@ -152,7 +152,7 @@ public class Splash extends Activity implements Animation.AnimationListener {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                new ParseError().sendError("Splash (SplashWait)", "doInBackground", "" + e, e.getCause().toString(), e.getLocalizedMessage(), e.getMessage());
+                new ParseError().sendError("Splash (SplashWait)", "doInBackground", "" + e, e.getCause().toString(), e.getMessage());
             }
 
             return null;

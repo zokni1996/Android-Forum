@@ -8,7 +8,7 @@
             android:key="Notification"
             android:summary="@string/NotificationSummary"
             android:title="@string/Notification" />
-        <ListPreference
+        <com.afollestad.materialdialogs.prefs.MaterialListPreference
             android:defaultValue="300000"
             android:dependency="Notification"
             android:entries="@array/NotificationTimeCheck"
@@ -16,7 +16,7 @@
             android:key="NotificationTimeCheck"
             android:summary="%s"
             android:title="@string/Refresh" />
-        <ListPreference
+        <com.afollestad.materialdialogs.prefs.MaterialListPreference
             android:defaultValue="0"
             android:dependency="Notification"
             android:entries="@array/NotificationPriority"
@@ -24,7 +24,7 @@
             android:key="NotificationPriority"
             android:summary="%s"
             android:title="@string/Priority" />
-        <ListPreference
+        <com.afollestad.materialdialogs.prefs.MaterialListPreference
             android:defaultValue="4"
             android:dependency="Notification"
             android:entries="@array/NotificationStyle"
@@ -32,7 +32,7 @@
             android:key="NotificationStyle"
             android:summary="%s"
             android:title="@string/Style" />
-        <ListPreference
+        <com.afollestad.materialdialogs.prefs.MaterialListPreference
             android:defaultValue="1"
             android:dependency="Notification"
             android:entries="@array/NotificationRow"

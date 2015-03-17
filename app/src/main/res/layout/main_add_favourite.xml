@@ -4,32 +4,15 @@
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="6dp"
-        android:paddingRight="6dp"
-        android:paddingTop="6dp"
-        android:paddingBottom="6dp">
+        android:text="@string/Name" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/Name" />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/editTextFavouriteName"
-            android:hint="@string/FavouriteHint" />
-    </LinearLayout>
-
-    <Button
+    <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/Save"
-        android:id="@+id/buttonSaveFavourite"
-        style="@style/ButtonStyleRounded" />
+        android:id="@+id/editTextFavouriteName"
+        android:hint="@string/FavouriteHint" />
 
 </LinearLayout>

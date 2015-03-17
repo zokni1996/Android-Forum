@@ -11,7 +11,7 @@
             android:key="Zoom"
             android:summary="@string/ZoomSummary"
             android:title="@string/ZoomWithHand" />
-        <ListPreference
+        <com.afollestad.materialdialogs.prefs.MaterialListPreference
             android:defaultValue="100"
             android:entries="@array/Zoom"
             android:entryValues="@array/ZoomNumbers"
