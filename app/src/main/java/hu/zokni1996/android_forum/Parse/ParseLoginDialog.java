@@ -70,7 +70,7 @@ public class ParseLoginDialog {
         final MaterialDialog dialog = new MaterialDialog.Builder(context)
                 .customView(R.layout.parse_login, true)
                 .title(context.getString(R.string.ParseLogIn))
-                .cancelable(false)
+                .cancelable(true)
                 .negativeText(context.getString(R.string.cancel))
                 .positiveText(context.getString(R.string.ParseLogIn))
                 .callback(new MaterialDialog.ButtonCallback() {

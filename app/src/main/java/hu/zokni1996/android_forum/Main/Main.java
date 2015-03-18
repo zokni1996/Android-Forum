@@ -46,7 +46,7 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
     boolean booleanMenu = true;
     ActionBarDrawerToggle mDrawerToggle;
     Toolbar toolbar;
-    WebFragment webFragment;
+    static WebFragment webFragment;
     boolean booleanOnKeyDown = true;
     ActiveTopicsFragment activeTopicsFragment;
     ActionBar actionBar;
@@ -117,75 +117,46 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 int editedPosition = position + 1;
                 if (editedPosition == 1) {
-                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null) {
-                        booleanMenu = true;
-                        invalidateOptionsMenu();
-                        webFragment.LoadURL("http://android-forum.hu/index.php?mobile=mobile");
-                        webFragment.booleanClearHistory = true;
-                        mDrawerLayout.closeDrawer(mDrawerList);
-                    } else {
-                        booleanMenu = true;
-                        invalidateOptionsMenu();
+                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null)
                         getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
-                        webFragment.LoadURL("http://android-forum.hu/index.php?mobile=mobile");
-                        mDrawerLayout.closeDrawer(mDrawerList);
-                    }
+                    booleanMenu = true;
+                    invalidateOptionsMenu();
+                    webFragment.LoadURL("http://android-forum.hu/index.php?mobile=mobile");
+                    webFragment.booleanClearHistory = true;
+                    mDrawerLayout.closeDrawer(mDrawerList);
+
                 }
                 if (editedPosition == 2) {
-                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null) {
-                        booleanFavourites = true;
-                        mDrawerLayout.closeDrawer(mDrawerList);
-                    } else {
-                        booleanFavourites = true;
-                        booleanMenu = true;
-                        invalidateOptionsMenu();
+                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null)
                         getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
-                        getSupportActionBar().setTitle(webFragment.setTitleWebView());
-                        mDrawerLayout.closeDrawer(mDrawerList);
-                    }
+                    booleanFavourites = true;
+                    mDrawerLayout.closeDrawer(mDrawerList);
                 }
                 if (editedPosition == 3) {
                     if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null) {
-                        getSupportActionBar().setTitle(strings[2]);
-                        mDrawerLayout.closeDrawer(mDrawerList);
                         activeTopicsFragment = new ActiveTopicsFragment();
-                        booleanMenu = false;
-                        invalidateOptionsMenu();
                         getFragmentManager().beginTransaction().add(R.id.frameLayout, activeTopicsFragment, "ACTIVE_TOPICS_FRAGMENT").commit();
-                    } else {
-                        booleanMenu = false;
-                        invalidateOptionsMenu();
-                        getSupportActionBar().setTitle(strings[2]);
-                        mDrawerLayout.closeDrawer(mDrawerList);
                     }
+                    booleanMenu = false;
+                    invalidateOptionsMenu();
+                    getSupportActionBar().setTitle(strings[2]);
+                    mDrawerLayout.closeDrawer(mDrawerList);
                 }
                 if (editedPosition == 4) {
-                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null) {
-                        booleanMenu = true;
-                        invalidateOptionsMenu();
-                        webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unanswered");
-                        mDrawerLayout.closeDrawer(mDrawerList);
-                    } else {
-                        booleanMenu = true;
-                        invalidateOptionsMenu();
+                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null)
                         getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
-                        webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unanswered");
-                        mDrawerLayout.closeDrawer(mDrawerList);
-                    }
+                    booleanMenu = true;
+                    invalidateOptionsMenu();
+                    webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unanswered");
+                    mDrawerLayout.closeDrawer(mDrawerList);
                 }
                 if (editedPosition == 5) {
-                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null) {
-                        booleanMenu = true;
-                        invalidateOptionsMenu();
-                        webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unreadposts");
-                        mDrawerLayout.closeDrawer(mDrawerList);
-                    } else {
-                        booleanMenu = true;
-                        invalidateOptionsMenu();
+                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null)
                         getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
-                        webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unreadposts");
-                        mDrawerLayout.closeDrawer(mDrawerList);
-                    }
+                    booleanMenu = true;
+                    invalidateOptionsMenu();
+                    webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unreadposts");
+                    mDrawerLayout.closeDrawer(mDrawerList);
                 }
                 if (editedPosition == 6)
                     startActivity(new Intent(getApplicationContext(), Settings.class));
@@ -383,6 +354,10 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
 
             return itemView;
         }
+    }
+
+    public static WebFragment getWebFragment() {
+        return webFragment;
     }
 
 }

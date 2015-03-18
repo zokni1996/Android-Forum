@@ -25,17 +25,12 @@ public class AddToFavourite {
                 .customView(R.layout.main_add_favourite, true)
                 .title(context.getString(R.string.AddFavourite))
                 .positiveText(context.getString(R.string.Save))
-                .cancelable(false)
+                .cancelable(true)
                 .negativeText(context.getString(R.string.cancel))
                 .callback(new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
-                        String string = context.getSharedPreferences("FAVOURITES", Context.MODE_PRIVATE).getString("Favourites", "");
-                        string += link;
-                        string += "THIS_IS_LINK_SPLIT";
-                        string += editText.getText().toString();
-                        string += "THIS_IS_THE_SPLIT";
-                        context.getSharedPreferences("FAVOURITES", Context.MODE_PRIVATE).edit().putString("Favourites", string).commit();
+                        new BookmarksHelper(context).addBookmark(new Bookmark(editText.getText().toString(), link));
                         dialog.dismiss();
                         Toast.makeText(context, context.getString(R.string.SavedSuccessFully), Toast.LENGTH_SHORT).show();
                     }

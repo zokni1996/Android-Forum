@@ -32,7 +32,7 @@ public class ParseSendNotificationDialog {
                 .customView(R.layout.parse_notification, true)
                 .positiveText(context.getString(R.string.SendNotification))
                 .negativeText(context.getString(R.string.cancel))
-                .cancelable(false)
+                .cancelable(true)
                 .callback(new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(final MaterialDialog dialog) {
