@@ -41,6 +41,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
 
+import hu.zokni1996.android_forum.Main.Main;
 import hu.zokni1996.android_forum.Parse.ParseError;
 import hu.zokni1996.android_forum.R;
 
@@ -57,18 +58,11 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
     private FloatingActionButton floatingActionButtonFORWARD;
     private SwipeRefreshLayout swipeRefreshLayout;
     private String titleWebView = "";
-    private WebFragmentWebClicked webFragmentWebClicked;
 
-    public interface WebFragmentWebClicked {
-        int getActionBarSize();
-
-        void setActionBarTitle(String title);
-    }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        webFragmentWebClicked = (WebFragmentWebClicked) activity;
     }
 
     @Override
@@ -232,19 +226,19 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                             }
                         }
                     }
-                    webFragmentWebClicked.setActionBarTitle(titleTwo);
+                    Main.setActionBarTitle(titleTwo);
                     titleWebView = titleTwo;
                 } catch (Exception e) {
-                    webFragmentWebClicked.setActionBarTitle(stringTitle);
+                    Main.setActionBarTitle(stringTitle);
                     parseError.sendError("Main.class", "setTitleError", "" + e, e.getCause().toString(), e.getMessage());
                     titleWebView = stringTitle;
                 }
                 if (booleanFailedLoadURL) {
                     String CurrentLanguage = Locale.getDefault().getDisplayLanguage();
                     if (CurrentLanguage.equals("magyar"))
-                        webFragmentWebClicked.setActionBarTitle(getString(R.string.FailedLoadURL));
+                        Main.setActionBarTitle(getString(R.string.FailedLoadURL));
                     else
-                        webFragmentWebClicked.setActionBarTitle(getString(R.string.FailedLoadURL));
+                        Main.setActionBarTitle(getString(R.string.FailedLoadURL));
                 }
                 super.onPageFinished(view, url);
             }
@@ -314,7 +308,7 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
         observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                progressBarLoad.setY(webFragmentWebClicked.getActionBarSize() + (float) Math.ceil(25 * getResources().getDisplayMetrics().density) - 10);
+                progressBarLoad.setY(Main.getActionBarSize() + (float) Math.ceil(25 * getResources().getDisplayMetrics().density) - 10);
 
                 ViewTreeObserver observer = progressBarLoad.getViewTreeObserver();
                 observer.removeOnGlobalLayoutListener(this);
@@ -381,13 +375,6 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
         return webViewMain;
     }
 
-    public FloatingActionButton getFloatingActionButtonBACK() {
-        return floatingActionButtonBACK;
-    }
-
-    public FloatingActionButton getFloatingActionButtonFORWARD() {
-        return floatingActionButtonFORWARD;
-    }
 
     public SwipeRefreshLayout getSwipeRefreshLayout() {
         return swipeRefreshLayout;
