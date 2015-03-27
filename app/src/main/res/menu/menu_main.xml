@@ -4,6 +4,6 @@
  <item
      app:showAsAction="ifRoom"
      android:id="@+id/favouriteMenu"
-     android:title="@string/AddFavourite"
-     android:icon="@drawable/ic_action_content_add_circle_outline"/>
+     android:title="@string/action_settings"
+     android:icon="@drawable/ic_action_action_settings_holo_light"/>
 </menu>

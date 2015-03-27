@@ -3,7 +3,6 @@ package hu.zokni1996.android_forum.Main.Web;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -23,17 +22,11 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.melnykov.fab.FloatingActionButton;
-import com.parse.Parse;
-import com.parse.ParseException;
-import com.parse.ParseInstallation;
-import com.parse.ParsePush;
-import com.parse.SaveCallback;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,24 +34,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
 
+import hu.zokni1996.android_forum.Favourites.AddToFavourite;
 import hu.zokni1996.android_forum.Main.Main;
-import hu.zokni1996.android_forum.Parse.ParseError;
 import hu.zokni1996.android_forum.R;
 
 public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private WebView webViewMain;
     private ProgressBar progressBarLoad;
-    private ParseError parseError = new ParseError();
     private String[] stringFailedLoadPage = new String[2];
     public boolean booleanClearHistory = true;
     private String stringFailingURL = "";
     private boolean booleanFailedLoadURL = false;
     private boolean booleanReloadSwipe = false;
-    private FloatingActionButton floatingActionButtonBACK;
-    private FloatingActionButton floatingActionButtonFORWARD;
+    private FloatingActionButton floatingActionButtonFAVOURITES;
     private SwipeRefreshLayout swipeRefreshLayout;
     private String titleWebView = "";
-
 
     @Override
     public void onAttach(Activity activity) {
@@ -68,15 +58,13 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.main_web, container, false);
-        InitializeParse();
         webViewMain = (WebView) view.findViewById(R.id.WebViewMain);
-        floatingActionButtonBACK = (FloatingActionButton) view.findViewById(R.id.WebViewBack);
-        floatingActionButtonFORWARD = (FloatingActionButton) view.findViewById(R.id.WebViewForward);
+        floatingActionButtonFAVOURITES = (FloatingActionButton) view.findViewById(R.id.WebViewFavouritesAdd);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.SwipeContainer);
-        progressBarLoad = new ProgressBar(getActivity().getBaseContext(), null, android.R.attr.progressBarStyleHorizontal);
+
         getSettings(PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext()));
         FloatingActionButtonSETUP();
-        ProgressBarSETUP();
+        ProgressBarSETUP(view);
         webViewMain.setWebViewClient(new WebViewClient() {
             //TESTING!!!!
             @Override
@@ -126,7 +114,7 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                             handler.useHttpAuthUsernamePassword();
                             dialog.dismiss();
                         } catch (Exception e) {
-                            parseError.sendError("Main.java", "AUTH_USERNAME_PASSWORD", "" + e, e.getCause().toString(), e.getMessage());
+                            e.printStackTrace();
                         }
                     }
                 });
@@ -152,7 +140,7 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                         booleanFailedLoadURL = true;
                         input.close();
                     } catch (IOException e) {
-                        parseError.sendError("Main.java", "OnReceivedError", "" + e, e.getCause().toString(), e.getMessage());
+                        e.printStackTrace();
                     }
                     view.loadDataWithBaseURL(null, stringFailedLoadPage[0], "text/html; charset=utf-8", "UTF-8",
                             null);
@@ -191,25 +179,11 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                 return false;
             }
 
-
             @Override
             public void onPageFinished(WebView view, String url) {
                 if (booleanClearHistory) {
                     booleanClearHistory = false;
                     webViewMain.clearHistory();
-                    if (!webViewMain.canGoBack())
-                        floatingActionButtonBACK.hide();
-                    else floatingActionButtonBACK.show();
-                    if (!webViewMain.canGoForward())
-                        floatingActionButtonFORWARD.hide();
-                    else floatingActionButtonFORWARD.show();
-                } else {
-                    if (!webViewMain.canGoBack())
-                        floatingActionButtonBACK.hide();
-                    else floatingActionButtonBACK.show();
-                    if (!webViewMain.canGoForward())
-                        floatingActionButtonFORWARD.hide();
-                    else floatingActionButtonFORWARD.show();
                 }
                 if (booleanReloadSwipe) {
                     booleanReloadSwipe = false;
@@ -230,7 +204,7 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                     titleWebView = titleTwo;
                 } catch (Exception e) {
                     Main.setActionBarTitle(stringTitle);
-                    parseError.sendError("Main.class", "setTitleError", "" + e, e.getCause().toString(), e.getMessage());
+                    e.printStackTrace();
                     titleWebView = stringTitle;
                 }
                 if (booleanFailedLoadURL) {
@@ -244,6 +218,7 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
             }
 
         });
+
         webViewMain.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int progress) {
@@ -297,19 +272,16 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
         webViewMain.loadUrl(aURL);
     }
 
-    public void ProgressBarSETUP() {
-        progressBarLoad.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 24));
+    public void ProgressBarSETUP(View view) {
+        progressBarLoad = (ProgressBar) view.findViewById(R.id.progressBar);
+        progressBarLoad.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 24));
         progressBarLoad.setProgress(100);
         progressBarLoad.setProgressDrawable(getResources().getDrawable(R.drawable.progress_horizontal_holo_light));
-        FrameLayout decorView = (FrameLayout) getActivity().getWindow().getDecorView();
-        decorView.addView(progressBarLoad);
-
         ViewTreeObserver observer = progressBarLoad.getViewTreeObserver();
         observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                progressBarLoad.setY(Main.getActionBarSize() + (float) Math.ceil(25 * getResources().getDisplayMetrics().density) - 10);
-
+                progressBarLoad.setY(((float) Math.ceil(12.5 * getResources().getDisplayMetrics().density) - 38));
                 ViewTreeObserver observer = progressBarLoad.getViewTreeObserver();
                 observer.removeOnGlobalLayoutListener(this);
             }
@@ -317,50 +289,12 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
     }
 
     private void FloatingActionButtonSETUP() {
-        floatingActionButtonBACK.hide(false);
-        floatingActionButtonFORWARD.hide(false);
-        floatingActionButtonBACK.setOnClickListener(new View.OnClickListener() {
+        floatingActionButtonFAVOURITES.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (webViewMain.canGoBack()) {
-                    progressBarLoad.setVisibility(View.VISIBLE);
-                    progressBarLoad.setProgress(0);
-                    webViewMain.goBack();
-                }
+                new AddToFavourite(webViewMain.getUrl(), Main.getContext());
             }
         });
-        floatingActionButtonFORWARD.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (webViewMain.canGoForward()) {
-                    progressBarLoad.setVisibility(View.VISIBLE);
-                    progressBarLoad.setProgress(0);
-                    webViewMain.goForward();
-                }
-            }
-        });
-    }
-
-    private void InitializeParse() {
-        ParseInstallation.getCurrentInstallation().saveInBackground();
-        Parse.setLogLevel(Parse.LOG_LEVEL_INFO);
-        if (!getActivity().getSharedPreferences("PARSE_EVERYBODY", Context.MODE_PRIVATE).getBoolean("ParseEveryBody", false))
-            ParsePush.subscribeInBackground("everyBody", new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e == null) {
-                        getActivity().getSharedPreferences("PARSE_EVERYBODY", Context.MODE_PRIVATE)
-                                .edit()
-                                .putBoolean("ParseEveryBody", true)
-                                .commit();
-                    } else {
-                        getActivity().getSharedPreferences("PARSE_EVERYBODY", Context.MODE_PRIVATE)
-                                .edit()
-                                .putBoolean("ParseEveryBody", false)
-                                .commit();
-                    }
-                }
-            });
     }
 
     public String setTitleWebView() {
@@ -375,10 +309,6 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
         return webViewMain;
     }
 
-
-    public SwipeRefreshLayout getSwipeRefreshLayout() {
-        return swipeRefreshLayout;
-    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {

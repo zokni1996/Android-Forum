@@ -27,7 +27,7 @@ public class ParseError {
         error.put("Activity", activity);
         error.put("Cause", cause);
         error.put("Message", message);
-        error.saveEventually();
+        error.saveInBackground();
     }
 
     private String GetDeviceName() {

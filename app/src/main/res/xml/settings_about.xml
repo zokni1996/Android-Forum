@@ -1,24 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference android:layout="@layout/settings_about" />
 
-    <PreferenceCategory android:title="@string/Copyright">
-        <Preference android:layout="@layout/settings_about" />
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/ThanksTo">
-        <Preference android:layout="@layout/settings_thanks" />
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/Support">
-        <Preference android:layout="@layout/settings_support" />
+    <PreferenceCategory android:title="@string/Other">
         <Preference
             android:key="ChangeLog"
             android:title="@string/ChangeLog" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/Other">
         <Preference
             android:summary="@string/OpenInBrowserSummary"
             android:title="@string/OpenInBrowser">

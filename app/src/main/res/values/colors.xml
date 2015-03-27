@@ -3,8 +3,11 @@
     <color name="green">#99cc00</color>
     <color name="green_darker">#CC669900</color>
     <color name="gray">#c8ccbb</color>
-    <color name="red">#f44336</color>
-    <color name="blue">#CA2196F3</color>
-    <color name="blue_darker">#CA1976D2</color>
-    <color name="blue_lighter">#00bcd4</color>
+    <color name="gray_lighter">#eeeeee</color>
+    <color name="gray_darker">#f9f9f9</color>
+    <color name="red">#F44336</color>
+    <color name="red_darker">#D32F2F</color>
+    <color name="blue">#2196F3</color>
+    <color name="blue_darker">#1976D2</color>
+    <color name="blue_lighter">#03A9F4</color>
 </resources>

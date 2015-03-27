@@ -291,9 +291,9 @@ public class Settings extends PreferenceActivity {
             context = getActivity();
             parseLoginDialog = new ParseLoginDialog(context);
             parseLoginDialog.tryToLogIn();
-            if (ParseUser.getCurrentUser() != null) {
+            if (ParseUser.getCurrentUser() != null)
                 SuccessLoggedIn();
-            } else {
+            else
                 findPreference("ParseLogin").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
@@ -303,7 +303,7 @@ public class Settings extends PreferenceActivity {
                         return true;
                     }
                 });
-            }
+
         }
 
 

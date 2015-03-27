@@ -1,63 +1,56 @@
 package hu.zokni1996.android_forum.Main;
 
 
+import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import com.afollestad.materialdialogs.AlertDialogWrapper;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.parse.Parse;
+import com.parse.ParseAnalytics;
+import com.parse.ParseException;
+import com.parse.ParseInstallation;
+import com.parse.ParsePush;
+import com.parse.SaveCallback;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import hu.zokni1996.android_forum.Favourites.AddToFavourite;
 import hu.zokni1996.android_forum.Favourites.GetFavourites;
-import hu.zokni1996.android_forum.Items.Items;
 import hu.zokni1996.android_forum.Main.ActiveTopics.ActiveTopicsFragment;
 import hu.zokni1996.android_forum.Main.Web.WebFragment;
 import hu.zokni1996.android_forum.R;
 
 public class Main extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    DrawerLayout mDrawerLayout;
-    ListView mDrawerList;
-    List<Items> itemsList = new ArrayList<>();
-    boolean booleanMenu = true;
-    ActionBarDrawerToggle mDrawerToggle;
     static WebFragment webFragment = new WebFragment();
     ActiveTopicsFragment activeTopicsFragment = new ActiveTopicsFragment();
     static ActionBar actionBar;
-    boolean booleanLoadNewPost = false;
-    boolean booleanFavourites = false;
+    public AccountHeader.Result headerResult = null;
+    public Drawer.Result result = null;
+    static Context context;
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        if (booleanMenu)
-            menu.findItem(R.id.favouriteMenu).setVisible(true);
-        else
-            menu.findItem(R.id.favouriteMenu).setVisible(false);
         return true;
     }
 
@@ -65,17 +58,81 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_main);
-
+        context = Main.this;
         //Get the references for the objects
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.Drawer);
-        mDrawerList = (ListView) findViewById(android.R.id.list);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.Toolbar);
+        InitializeParse();
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        actionBar = getSupportActionBar();
+        headerResult = new AccountHeader()
+                .withActivity(this)
+                .withHeaderBackground(R.drawable.header)
+                .withSelectionFirstLine(getResources().getString(R.string.NameApp))
+                .addProfiles(new ProfileDrawerItem().withName(getResources().getString(R.string.NameApp)).withIcon(getResources().getDrawable(R.mipmap.ic_launcher)))
+                .withCurrentProfileHiddenInList(true)
+                .withProfileImagesVisible(true)
+                .withProfileImagesClickable(false)
+                .withSelectionListEnabled(false)
+                .withSavedInstance(savedInstanceState)
+                .build();
+        final String[] strings = getResources().getStringArray(R.array.drawer_list);
+        result = new Drawer()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withAccountHeader(headerResult)
+                .withHeaderDivider(false)
+                .withCloseOnClick(true)
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withName(strings[0]).withIcon(GoogleMaterial.Icon.gmd_home).withIdentifier(1).withCheckable(false)
+                                .withSelectedTextColor(getResources().getColor(android.R.color.black))
+                                .withSelectedIconColor(getResources().getColor(android.R.color.black))
+                                .withSelectedColor(getResources().getColor(R.color.gray_darker)),
+                        new PrimaryDrawerItem().withName(strings[1]).withIcon(GoogleMaterial.Icon.gmd_stars).withIdentifier(2).withCheckable(false),
+                        new PrimaryDrawerItem().withName(strings[2]).withIcon(GoogleMaterial.Icon.gmd_hearing).withIdentifier(3).withCheckable(false),
+                        new PrimaryDrawerItem().withName(strings[3]).withIcon(GoogleMaterial.Icon.gmd_announcement).withIdentifier(4).withCheckable(false),
+                        new PrimaryDrawerItem().withName(strings[4]).withIcon(GoogleMaterial.Icon.gmd_visibility_off).withIdentifier(5).withCheckable(false),
+                        new DividerDrawerItem()
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
+                        if (drawerItem.getIdentifier() == 1) {
+                            if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null)
+                                getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
+                            webFragment.LoadURL("http://android-forum.hu/index.php?mobile=mobile");
+                            webFragment.booleanClearHistory = true;
+                        } else if (drawerItem.getIdentifier() == 2) {
+                            if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null)
+                                getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
+                            new GetFavourites(Main.this);
+                        } else if (drawerItem.getIdentifier() == 3) {
+                            if (!activeTopicsFragment.isAdded()) {
+                                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                                fragmentTransaction.add(R.id.frameLayout, activeTopicsFragment, "ACTIVE_TOPICS_FRAGMENT").commit();
+                                getSupportActionBar().setTitle(strings[2]);
+                            }
+                        } else if (drawerItem.getIdentifier() == 4) {
+                            if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null)
+                                getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
+                            webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unanswered");
+                        } else if (drawerItem.getIdentifier() == 5) {
+                            if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null)
+                                getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
+                            webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unreadposts");
+                        }
+                    }
+                })
+                .withSavedInstance(savedInstanceState)
 
-        DrawerSETUP();
-
+                .build();
+        result.getListView().setVerticalScrollBarEnabled(false);
         //Cancel all the application notification
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancelAll();
         Bundle extras = getIntent().getExtras();
+        boolean booleanLoadNewPost = false;
         if (extras != null)
             booleanLoadNewPost = extras.getBoolean("nameID");
 
@@ -85,123 +142,17 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
         if (booleanLoadNewPost) {
             getFragmentManager().beginTransaction().add(R.id.frameLayout, webFragment, "WEB_FRAGMENT").commit();
             getFragmentManager().beginTransaction().add(R.id.frameLayout, activeTopicsFragment, "ACTIVE_TOPICS_FRAGMENT").commit();
-            booleanLoadNewPost = false;
+            getSupportActionBar().setTitle(strings[2]);
         } else {
             getFragmentManager().beginTransaction().add(R.id.frameLayout, webFragment, "WEB_FRAGMENT").commit();
         }
     }
 
-    private void DrawerSETUP() {
-        final String[] strings = getResources().getStringArray(R.array.drawer_list);
-        itemsList.add(new Items(strings[0], R.drawable.ic_action_action_home_holo_light));
-        itemsList.add(new Items(strings[1], R.drawable.ic_action_action_stars));
-        itemsList.add(new Items(strings[2], R.drawable.ic_action_new));
-        itemsList.add(new Items(strings[3], R.drawable.ic_action_communication_forum));
-        itemsList.add(new Items(strings[4], R.drawable.ic_action_action_visibility_off));
-        itemsList.add(new Items(strings[5], R.drawable.ic_action_action_settings_holo_light));
-        ArrayAdapter<Items> itemsArrayAdapter = new ListViewAdapter();
-
-        mDrawerList.setAdapter(itemsArrayAdapter);
-        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                int editedPosition = position + 1;
-                if (editedPosition == 1) {
-                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null)
-                        getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
-                    webFragment.LoadURL("http://android-forum.hu/index.php?mobile=mobile");
-                    webFragment.booleanClearHistory = true;
-                    mDrawerLayout.closeDrawer(mDrawerList);
-
-                }
-                if (editedPosition == 2) {
-                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null)
-                        getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
-                    booleanFavourites = true;
-                    mDrawerLayout.closeDrawer(mDrawerList);
-                }
-                if (editedPosition == 3) {
-                    if (!activeTopicsFragment.isAdded()) {
-                        getFragmentManager().beginTransaction().add(R.id.frameLayout, activeTopicsFragment, "ACTIVE_TOPICS_FRAGMENT").commit();
-                    }
-                    mDrawerLayout.closeDrawer(mDrawerList);
-                }
-                if (editedPosition == 4) {
-                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null)
-                        getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
-                    webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unanswered");
-                    mDrawerLayout.closeDrawer(mDrawerList);
-                }
-                if (editedPosition == 5) {
-                    if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null)
-                        getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT")).commit();
-                    webFragment.LoadURL("http://android-forum.hu/search.php?mobile=mobile&search_id=unreadposts");
-                    mDrawerLayout.closeDrawer(mDrawerList);
-                }
-                if (editedPosition == 6)
-                    startActivity(new Intent(getApplicationContext(), Settings.class));
-            }
-        });
-        Toolbar toolbar = (Toolbar) findViewById(R.id.Toolbar);
-        mDrawerToggle = new ActionBarDrawerToggle(this,
-                mDrawerLayout,
-                toolbar,
-                R.string.drawer_open,
-                R.string.drawer_close) {
-
-            @Override
-            public void onDrawerSlide(View drawerView, float slideOffset) {
-                super.onDrawerSlide(drawerView, slideOffset);
-                webFragment.getSwipeRefreshLayout().setEnabled(false);
-                if (slideOffset == 0.0) {
-                    webFragment.getSwipeRefreshLayout().setEnabled(true);
-                }
-            }
-
-            public void onDrawerClosed(View v) {
-                super.onDrawerClosed(v);
-                invalidateOptionsMenu();
-                syncState();
-                if (booleanFavourites)
-                    new GetFavourites(Main.this);
-                booleanFavourites = false;
-                webFragment.getSwipeRefreshLayout().setEnabled(true);
-                if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null)
-                    getSupportActionBar().setTitle(strings[2]);
-                else
-                    actionBar.setTitle(webFragment.setTitleWebView());
-                if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") == null)
-                    booleanMenu = true;
-                else
-                    booleanLoadNewPost = false;
-                invalidateOptionsMenu();
-            }
-
-            public void onDrawerOpened(View v) {
-                super.onDrawerOpened(v);
-                invalidateOptionsMenu();
-                syncState();
-                webFragment.getSwipeRefreshLayout().setEnabled(false);
-                getSupportActionBar().setTitle(R.string.NameApp);
-                booleanMenu = false;
-                invalidateOptionsMenu();
-            }
-        };
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        mDrawerToggle.syncState();
-        actionBar = getSupportActionBar();
-    }
-
     @Override
     public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-            booleanMenu = true;
-            invalidateOptionsMenu();
-            if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
-                mDrawerLayout.closeDrawer(mDrawerList);
+            if (result.isDrawerOpen()) {
+                result.closeDrawer();
                 return true;
             }
             if (getFragmentManager().findFragmentByTag("ACTIVE_TOPICS_FRAGMENT") != null)
@@ -246,17 +197,40 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home: {
-                if (mDrawerLayout.isDrawerOpen(mDrawerList))
-                    mDrawerLayout.closeDrawer(mDrawerList);
+                if (result.isDrawerOpen())
+                    result.closeDrawer();
                 else
-                    mDrawerLayout.openDrawer(mDrawerList);
+                    result.openDrawer();
             }
             break;
             case R.id.favouriteMenu:
-                new AddToFavourite(webFragment.getWebViewMain().getUrl(), this);
+                startActivity(new Intent(getApplicationContext(), Settings.class));
                 break;
         }
         return true;
+    }
+
+    private void InitializeParse() {
+        ParseAnalytics.trackAppOpenedInBackground(getIntent());
+        ParseInstallation.getCurrentInstallation().saveInBackground();
+        Parse.setLogLevel(Parse.LOG_LEVEL_INFO);
+        if (!getSharedPreferences("PARSE_EVERYBODY", Context.MODE_PRIVATE).getBoolean("ParseEveryBody", false))
+            ParsePush.subscribeInBackground("everyBody", new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e == null) {
+                        getSharedPreferences("PARSE_EVERYBODY", Context.MODE_PRIVATE)
+                                .edit()
+                                .putBoolean("ParseEveryBody", true)
+                                .commit();
+                    } else {
+                        getSharedPreferences("PARSE_EVERYBODY", Context.MODE_PRIVATE)
+                                .edit()
+                                .putBoolean("ParseEveryBody", false)
+                                .commit();
+                    }
+                }
+            });
     }
 
     @Override
@@ -284,41 +258,6 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
             webFragment.getWebViewMain().getSettings().setBuiltInZoomControls(sharedPreferences.getBoolean(key, false));
     }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
-
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    public class ListViewAdapter extends ArrayAdapter<Items> {
-        public ListViewAdapter() {
-            super(Main.this, R.layout.main_list, itemsList);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View itemView = convertView;
-            if (itemView == null)
-                itemView = getLayoutInflater().inflate(R.layout.main_list, parent, false);
-
-            Items currentItem = itemsList.get(position);
-
-            ImageView imageView = (ImageView) itemView.findViewById(R.id.imageViewIconID);
-            TextView textView = (TextView) itemView.findViewById(R.id.textVewName);
-            imageView.setImageResource(currentItem.getIconID());
-            textView.setText(currentItem.getName());
-
-            return itemView;
-        }
-    }
-
     public static int getActionBarSize() {
         return actionBar.getHeight();
     }
@@ -329,5 +268,15 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
 
     public static void setActionBarTitle(String title) {
         actionBar.setTitle(title);
+    }
+
+    public static Context getContext() {
+        return context;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState = result.saveInstanceState(outState);
+        super.onSaveInstanceState(outState);
     }
 }

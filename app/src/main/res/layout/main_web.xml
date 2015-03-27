@@ -14,34 +14,21 @@
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <com.melnykov.fab.FloatingActionButton xmlns:fab="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/WebViewForward"
+        android:id="@+id/WebViewFavouritesAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="8dp"
-        android:padding="5dp"
-        android:src="@drawable/ic_navigation_arrow_forward"
-        fab:fab_colorNormal="@color/blue"
-        fab:fab_colorPressed="@color/blue_darker"
-        fab:fab_colorRipple="@color/blue_darker"
-        fab:fab_type="normal" />
-
-    <com.melnykov.fab.FloatingActionButton xmlns:fab="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/WebViewBack"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="8dp"
-        android:src="@drawable/ic_navigation_arrow_back"
-        fab:fab_colorNormal="@color/blue"
-        fab:fab_colorPressed="@color/blue_darker"
-        fab:fab_colorRipple="@color/blue_darker"
-        fab:fab_type="normal" />
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_content_add"
+        fab:fab_colorNormal="@color/blue_lighter"
+        fab:fab_colorPressed="@color/blue"
+        fab:fab_colorRipple="@color/blue_darker" />
 
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar" />
 </RelativeLayout>
