@@ -28,9 +28,9 @@
             android:id="@+id/editTextHttpAuthRequestUsername"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_action_action_account_circle"
+            android:drawableLeft="@drawable/ic_action_account_circle"
             android:drawablePadding="8dp"
-            android:drawableStart="@drawable/ic_action_action_account_circle"
+            android:drawableStart="@drawable/ic_action_account_circle"
             android:hint="@string/Username" />
 
         <TextView
@@ -42,9 +42,9 @@
             android:id="@+id/editTextHttpAuthRequestPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_action_communication_vpn_key"
+            android:drawableLeft="@drawable/ic_communication_vpn_key"
             android:drawablePadding="8dp"
-            android:drawableStart="@drawable/ic_action_communication_vpn_key"
+            android:drawableStart="@drawable/ic_communication_vpn_key"
             android:hint="@string/Password"
             android:inputType="textPassword" />
     </LinearLayout>

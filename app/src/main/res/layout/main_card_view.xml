@@ -31,6 +31,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Írta: NÉV"
                     android:id="@+id/textViewWhoWrite" />
@@ -38,6 +39,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Hova írta"
                     android:id="@+id/textViewWhereWrite"
@@ -47,6 +49,7 @@
 
                 <TextView
                     android:layout_width="wrap_content"
+                    android:textColor="@android:color/black"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="Hány perce"
@@ -75,6 +78,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Mit írt"
                     android:id="@+id/textViewWhatWrite" />

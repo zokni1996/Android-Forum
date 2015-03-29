@@ -45,3 +45,10 @@
 • Fragmentek használata<br />
 • CardView! --> jelenleg csak az atív témáknál<br />
 • Törölve sok felesleges sor kód<br />
+<hr /><span style="font-size: 125%; line-height: 116%;"><span style="font-weight: bold"><div style="text-align: center;">• 2.3.3 •</div></span></span><br />
+• Anyagszerű drawer<br />
+• Rengeteg hibajavítás<br />
+• Kártyák használata a szabályzatnál, valamit az alkalmazásról menüpontban<br />
+• Kinézet átdolgozva, törölve a sok felesleges ikon<br />
+• Stílus átalakítása<br />
+• Felesleges ikonok, fájlok törlése<br />

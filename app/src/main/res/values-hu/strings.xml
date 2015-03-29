@@ -147,4 +147,6 @@
     <string name="statistic_send_who">"Statisztika: Elküldve Szerző: "</string>
     <string name="who_write">"Írta: "</string>
     <string name="cancel">Mégse</string>
+    <string name="everybody">Mindenki</string>
+    <string name="moderators">Moderátorok</string>
 </resources>

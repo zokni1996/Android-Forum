@@ -35,17 +35,12 @@
                 <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Main.ActiveTopics.ActiveTopicsFragment"
-            android:theme="@android:style/Theme.Holo.Light"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/NameApp"
-            android:launchMode="singleTop"/>
         <activity
             android:name=".Main.Main"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/NameApp"
             android:launchMode="singleTop"
-            android:theme="@style/StyleThemeDrawer" />
+            android:theme="@style/ThemeMain" />
         <activity
             android:name=".Main.Settings"
             android:label="@string/NameSettings" />

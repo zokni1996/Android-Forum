@@ -84,11 +84,9 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
                 .withAccountHeader(headerResult)
                 .withHeaderDivider(false)
                 .withCloseOnClick(true)
+                .withSelectedItem(-1)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName(strings[0]).withIcon(GoogleMaterial.Icon.gmd_home).withIdentifier(1).withCheckable(false)
-                                .withSelectedTextColor(getResources().getColor(android.R.color.black))
-                                .withSelectedIconColor(getResources().getColor(android.R.color.black))
-                                .withSelectedColor(getResources().getColor(R.color.gray_darker)),
+                        new PrimaryDrawerItem().withName(strings[0]).withIcon(GoogleMaterial.Icon.gmd_home).withIdentifier(1).withCheckable(false),
                         new PrimaryDrawerItem().withName(strings[1]).withIcon(GoogleMaterial.Icon.gmd_stars).withIdentifier(2).withCheckable(false),
                         new PrimaryDrawerItem().withName(strings[2]).withIcon(GoogleMaterial.Icon.gmd_hearing).withIdentifier(3).withCheckable(false),
                         new PrimaryDrawerItem().withName(strings[3]).withIcon(GoogleMaterial.Icon.gmd_announcement).withIdentifier(4).withCheckable(false),
@@ -128,6 +126,7 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
 
                 .build();
         result.getListView().setVerticalScrollBarEnabled(false);
+
         //Cancel all the application notification
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancelAll();

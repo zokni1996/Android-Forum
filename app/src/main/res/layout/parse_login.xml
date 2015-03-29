@@ -12,8 +12,8 @@
         android:ems="10"
         android:hint="@string/Username"
         android:id="@+id/ParseUsername"
-        android:drawableStart="@drawable/ic_action_action_account_circle"
-        android:drawableLeft="@drawable/ic_action_action_account_circle"
+        android:drawableStart="@drawable/ic_action_account_circle"
+        android:drawableLeft="@drawable/ic_action_account_circle"
         android:drawablePadding="8dp" />
 
     <EditText
@@ -23,8 +23,8 @@
         android:ems="10"
         android:hint="@string/Password"
         android:id="@+id/ParsePassword"
-        android:drawableStart="@drawable/ic_action_communication_vpn_key"
-        android:drawableLeft="@drawable/ic_action_communication_vpn_key"
+        android:drawableStart="@drawable/ic_communication_vpn_key"
+        android:drawableLeft="@drawable/ic_communication_vpn_key"
         android:drawablePadding="8dp" />
 
 </LinearLayout>

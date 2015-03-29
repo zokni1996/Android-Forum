@@ -147,5 +147,7 @@
     <string name="web_error_code_2"><![CDATA[" •</div>"]]></string>
     <string name="statistic_send_who">"Statistic: Sent Wrote by: "</string>
     <string name="who_write">"Wrote: "</string>
-    <string name="cancel">Mégse</string>
+    <string name="cancel">Cancel</string>
+    <string name="everybody">Everybody</string>
+    <string name="moderators">Moderators</string>
 </resources>

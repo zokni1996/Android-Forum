@@ -14,6 +14,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
         android:text="@string/SendToNotification" />
 
     <RadioGroup
@@ -24,12 +25,14 @@
         <RadioButton
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Mindenki"
+            android:textColor="@android:color/black"
+            android:text="@string/moderators"
             android:id="@+id/radioButton_everybody"/>
         <RadioButton
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Moderátorok"
+            android:textColor="@android:color/black"
+            android:text="@string/everybody"
             android:id="@+id/radioButton_moderators"/>
     </RadioGroup>
 

@@ -47,3 +47,10 @@
 • Now I use fragments<br />
 • CardView! --> only the active topics (YET)<br />
 • Deleted a lot of unnecessary lines...<br />
+<hr /><span style="font-size: 125%; line-height: 116%;"><span style="font-weight: bold"><div style="text-align: center;">• 2.3.3 •</div></span></span><br />
+• Material drawer<br />
+• Some fixes<br />
+• Use CardView in the rules, and the application fragment<br />
+• Rewrite the theme, deleted unnecessary icons<br />
+• Rewrite style<br />
+• Deleted unnecessary files<br />

@@ -7,7 +7,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -38,13 +37,11 @@ public class Settings extends PreferenceActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            setTheme(android.R.style.Theme_Material_Light);
-        else setTheme(R.style.StyleThemeSettings);
+        setTheme(R.style.StyleThemeSettings);
 
         actionBar = getActionBar();
         if (actionBar != null)
-            actionBar.setIcon(R.drawable.ic_action_action_settings_holo_light);
+            actionBar.setIcon(R.drawable.ic_action_settings);
         context = this;
         super.onCreate(savedInstanceState);
     }
@@ -54,17 +51,17 @@ public class Settings extends PreferenceActivity {
         loadHeadersFromResource(R.xml.activity_settings, target);
         for (Header header : target) {
             if (header.titleRes == R.string.AboutMe)
-                header.iconRes = R.drawable.ic_action_action_about_holo_light;
+                header.iconRes = R.drawable.ic_action_info_outline;
             if (header.titleRes == R.string.ScreenSettings)
-                header.iconRes = R.drawable.ic_action_hardware_phone_holo_light;
+                header.iconRes = R.drawable.ic_hardware_phone_android;
             if (header.titleRes == R.string.NotificationSettings)
-                header.iconRes = R.drawable.ic_action_action_announcement_holo_light;
+                header.iconRes = R.drawable.ic_action_announcement;
             if (header.titleRes == R.string.Extras)
-                header.iconRes = R.drawable.ic_action_social_plus_one_holo_light;
+                header.iconRes = R.drawable.ic_image_exposure_plus_1;
             if (header.titleRes == R.string.NameRules)
-                header.iconRes = R.drawable.ic_action_alerts_and_states_error_holo_light;
+                header.iconRes = R.drawable.ic_action_report_problem;
             if (header.titleRes == R.string.ParseSettingsNotificationName)
-                header.iconRes = R.drawable.ic_action_action_lock_holo_light;
+                header.iconRes = R.drawable.ic_action_https;
         }
     }
 
@@ -72,7 +69,6 @@ public class Settings extends PreferenceActivity {
     protected boolean isValidFragment(String fragmentName) {
         return true;
     }
-
 
     public static class FragmentSettingsExtra extends PreferenceFragment {
         Context context;
@@ -82,7 +78,7 @@ public class Settings extends PreferenceActivity {
 
             super.onActivityCreated(savedInstanceState);
             if (actionBar != null)
-                actionBar.setIcon(R.drawable.ic_action_social_plus_one_holo_light);
+                actionBar.setIcon(R.drawable.ic_image_exposure_plus_1);
             addPreferencesFromResource(R.xml.settings_extras);
             context = getActivity();
             VideoOnPreferenceClick("KeyFirstOne", "f73ZjSQU1Jo");
@@ -158,7 +154,7 @@ public class Settings extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             if (actionBar != null)
-                actionBar.setIcon(R.drawable.ic_action_action_about_holo_light);
+                actionBar.setIcon(R.drawable.ic_action_info_outline);
 
             addPreferencesFromResource(R.xml.settings_about);
             context = getActivity();
@@ -228,7 +224,7 @@ public class Settings extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             if (actionBar != null)
-                actionBar.setIcon(R.drawable.ic_action_hardware_phone_holo_light);
+                actionBar.setIcon(R.drawable.ic_hardware_phone_android);
 
             addPreferencesFromResource(R.xml.settings_screen);
         }
@@ -241,7 +237,7 @@ public class Settings extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             if (actionBar != null)
-                actionBar.setIcon(R.drawable.ic_action_action_announcement_holo_light);
+                actionBar.setIcon(R.drawable.ic_action_announcement);
 
             addPreferencesFromResource(R.xml.settings_notification);
             context = getActivity();
@@ -271,12 +267,11 @@ public class Settings extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             if (actionBar != null)
-                actionBar.setIcon(R.drawable.ic_action_alerts_and_states_error_holo_light);
+                actionBar.setIcon(R.drawable.ic_action_report_problem);
 
             addPreferencesFromResource(R.xml.settings_rules);
         }
     }
-
 
     public static class FragmentSettingsDeveloper extends PreferenceFragment {
         Context context;
@@ -286,14 +281,18 @@ public class Settings extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             if (actionBar != null)
-                actionBar.setIcon(R.drawable.ic_action_action_lock_holo_light);
+                actionBar.setIcon(R.drawable.ic_action_https);
             addPreferencesFromResource(R.xml.settings_developer);
             context = getActivity();
             parseLoginDialog = new ParseLoginDialog(context);
             parseLoginDialog.tryToLogIn();
             if (ParseUser.getCurrentUser() != null)
                 SuccessLoggedIn();
-            else
+            else {
+                findPreference("ParseLogin").setSummary("");
+                findPreference("ParseLogin").setTitle(getResources().getString(R.string.ParseLogIn));
+                findPreference("ParseLogin").setEnabled(true);
+                findPreference("ParseNotification").setEnabled(false);
                 findPreference("ParseLogin").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
@@ -303,7 +302,7 @@ public class Settings extends PreferenceActivity {
                         return true;
                     }
                 });
-
+            }
         }
 
 
@@ -321,7 +320,6 @@ public class Settings extends PreferenceActivity {
                     }
                 });
             }
-
         }
     }
 

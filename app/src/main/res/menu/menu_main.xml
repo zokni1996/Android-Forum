@@ -5,5 +5,5 @@
      app:showAsAction="ifRoom"
      android:id="@+id/favouriteMenu"
      android:title="@string/action_settings"
-     android:icon="@drawable/ic_action_action_settings_holo_light"/>
+     android:icon="@drawable/ic_action_settings"/>
 </menu>

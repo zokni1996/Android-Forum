@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Toolbar style -->
+    <style name="ToolbarTheme" parent="Theme.AppCompat">
+        <item name="android:textColorPrimary">@color/abc_primary_text_material_light</item>
+        <item name="actionMenuTextColor">@color/abc_primary_text_material_light</item>
+        <item name="android:textColorSecondary">@color/abc_secondary_text_material_light</item>
+    </style>
+
+    <!-- Buttons styled  -->
+    <style name="ButtonStyleRounded" parent="android:style/Widget.Button">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/button_rounded_holo_light</item>
+        <item name="android:padding">0dp</item>
+    </style>
+
+    <!-- Radio button -->
+    <style name="RadioButtonTheme" parent="android:Widget.CompoundButton.RadioButton">
+        <item name="android:button">@drawable/radio_button_check_holo_light</item>
+    </style>
+
+    <!-- Check box button -->
+    <style name="CheckBoxAppTheme" parent="android:Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/button_check_holo_light</item>
+    </style>
+
+    <!-- ActionBar styled -->
+    <style name="actionBarStyled" parent="android:Widget.ActionBar">
+        <item name="android:actionBarSize">?attr/actionBarSize</item>
+        <item name="android:background">@color/green</item>
+    </style>
+
+
+
+</resources>
