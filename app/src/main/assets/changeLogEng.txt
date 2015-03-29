@@ -54,3 +54,4 @@
 • Rewrite the theme, deleted unnecessary icons<br />
 • Rewrite style<br />
 • Deleted unnecessary files<br />
+• Materialized all the application<br />

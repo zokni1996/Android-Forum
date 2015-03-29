@@ -52,3 +52,4 @@
 • Kinézet átdolgozva, törölve a sok felesleges ikon<br />
 • Stílus átalakítása<br />
 • Felesleges ikonok, fájlok törlése<br />
+• Anyagszerű kinézet az egész alkalmazásnak!<br />
