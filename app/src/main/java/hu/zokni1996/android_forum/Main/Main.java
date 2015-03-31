@@ -27,11 +27,13 @@ import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.parse.LogInCallback;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParsePush;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import hu.zokni1996.android_forum.Favourites.GetFavourites;
@@ -213,23 +215,44 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
         ParseInstallation.getCurrentInstallation().saveInBackground();
         Parse.setLogLevel(Parse.LOG_LEVEL_INFO);
-        if (!getSharedPreferences("PARSE_EVERYBODY", Context.MODE_PRIVATE).getBoolean("ParseEveryBody", false))
+        if (!getSharedPreferences("PARSE_EVERYBODY", MODE_PRIVATE).getBoolean("ParseEveryBody", false))
             ParsePush.subscribeInBackground("everyBody", new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
                     if (e == null) {
-                        getSharedPreferences("PARSE_EVERYBODY", Context.MODE_PRIVATE)
+                        getSharedPreferences("PARSE_EVERYBODY", MODE_PRIVATE)
                                 .edit()
                                 .putBoolean("ParseEveryBody", true)
                                 .commit();
                     } else {
-                        getSharedPreferences("PARSE_EVERYBODY", Context.MODE_PRIVATE)
+                        getSharedPreferences("PARSE_EVERYBODY", MODE_PRIVATE)
                                 .edit()
                                 .putBoolean("ParseEveryBody", false)
                                 .commit();
                     }
                 }
             });
+        if (!getSharedPreferences("PARSE_MODERATORS", MODE_PRIVATE).getBoolean("ParseModerators", false)) {
+            String password = getSharedPreferences("PASSWORD", MODE_PRIVATE).getString("Password", "");
+            String username = getSharedPreferences("USERNAME", MODE_PRIVATE).getString("Username", "");
+            if (!username.equals("") && !password.equals("")) {
+                ParseUser.logInInBackground(username, password, new LogInCallback() {
+                    public void done(ParseUser user, ParseException e) {
+                        if (e == null)
+                            getSharedPreferences("PARSE_MODERATORS", MODE_PRIVATE)
+                                    .edit()
+                                    .putBoolean("ParseModerators", true)
+                                    .commit();
+                        else {
+                            getSharedPreferences("PARSE_MODERATORS", MODE_PRIVATE)
+                                    .edit()
+                                    .putBoolean("ParseModerators", false)
+                                    .commit();
+                        }
+                    }
+                });
+            }
+        }
     }
 
     @Override

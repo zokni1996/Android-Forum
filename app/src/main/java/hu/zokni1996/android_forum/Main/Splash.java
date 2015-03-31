@@ -23,6 +23,7 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.animation.Animation;
@@ -32,7 +33,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import hu.zokni1996.android_forum.Parse.ParseError;
 import hu.zokni1996.android_forum.R;
 
 public class Splash extends Activity implements Animation.AnimationListener {
@@ -152,7 +152,7 @@ public class Splash extends Activity implements Animation.AnimationListener {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                new ParseError().sendError("Splash (SplashWait)", "doInBackground", "" + e, e.getCause().toString(), e.getMessage());
+                Log.i("Splash (SplashWait)", "doInBackground "+ e.getMessage());
             }
 
             return null;

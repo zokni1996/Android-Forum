@@ -23,7 +23,6 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Locale;
 
-import hu.zokni1996.android_forum.Parse.ParseLoadingDialog;
 import hu.zokni1996.android_forum.Parse.ParseLoginDialog;
 import hu.zokni1996.android_forum.Parse.ParseSendNotificationDialog;
 import hu.zokni1996.android_forum.R;
@@ -33,7 +32,6 @@ public class Settings extends PreferenceActivity {
     static String changeLogHun = "";
     static String changeLogEng = "";
     static ActionBar actionBar;
-    Context context;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,7 +40,6 @@ public class Settings extends PreferenceActivity {
         actionBar = getActionBar();
         if (actionBar != null)
             actionBar.setIcon(R.drawable.ic_action_settings);
-        context = this;
         super.onCreate(savedInstanceState);
     }
 
@@ -71,7 +68,6 @@ public class Settings extends PreferenceActivity {
     }
 
     public static class FragmentSettingsExtra extends PreferenceFragment {
-        Context context;
 
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
@@ -80,7 +76,7 @@ public class Settings extends PreferenceActivity {
             if (actionBar != null)
                 actionBar.setIcon(R.drawable.ic_image_exposure_plus_1);
             addPreferencesFromResource(R.xml.settings_extras);
-            context = getActivity();
+            final Context context = getActivity();
             VideoOnPreferenceClick("KeyFirstOne", "f73ZjSQU1Jo");
             VideoOnPreferenceClick("KeyFirstTwo", "c8m_JF-bXm4");
             VideoOnPreferenceClick("KeySecondOne", "qgyndokygf4");
@@ -148,7 +144,6 @@ public class Settings extends PreferenceActivity {
     }
 
     public static class FragmentSettingsAbout extends PreferenceFragment {
-        Context context;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -157,7 +152,7 @@ public class Settings extends PreferenceActivity {
                 actionBar.setIcon(R.drawable.ic_action_info_outline);
 
             addPreferencesFromResource(R.xml.settings_about);
-            context = getActivity();
+            final Context context = getActivity();
 
             PackageInfo info = null;
             try {
@@ -230,8 +225,7 @@ public class Settings extends PreferenceActivity {
         }
     }
 
-    public static class FragmentSettingsNotification extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
-        Context context;
+    public static class FragmentSettingsNotification extends PreferenceFragment {
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -240,25 +234,6 @@ public class Settings extends PreferenceActivity {
                 actionBar.setIcon(R.drawable.ic_action_announcement);
 
             addPreferencesFromResource(R.xml.settings_notification);
-            context = getActivity();
-            findPreference("NotificationParseMaintenance").setEnabled(false);
-            new ParseLoginDialog(context).tryToLogIn();
-            if (ParseUser.getCurrentUser() != null) {
-                findPreference("NotificationParseMaintenance").setEnabled(true);
-                findPreference("NotificationParseMaintenance").setOnPreferenceChangeListener(this);
-            } else {
-                findPreference("NotificationParseMaintenance").setEnabled(false);
-            }
-        }
-
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object newValue) {
-            if ("NotificationParseMaintenance".equals(preference.getKey()))
-                if ((Boolean) newValue)
-                    new ParseLoadingDialog(context).subscribe();
-                else
-                    new ParseLoadingDialog(context).unsubscribe();
-            return true;
         }
     }
 
@@ -274,8 +249,7 @@ public class Settings extends PreferenceActivity {
     }
 
     public static class FragmentSettingsDeveloper extends PreferenceFragment {
-        Context context;
-        ParseLoginDialog parseLoginDialog;
+        String username;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -283,43 +257,53 @@ public class Settings extends PreferenceActivity {
             if (actionBar != null)
                 actionBar.setIcon(R.drawable.ic_action_https);
             addPreferencesFromResource(R.xml.settings_developer);
-            context = getActivity();
-            parseLoginDialog = new ParseLoginDialog(context);
-            parseLoginDialog.tryToLogIn();
-            if (ParseUser.getCurrentUser() != null)
-                SuccessLoggedIn();
-            else {
-                findPreference("ParseLogin").setSummary("");
-                findPreference("ParseLogin").setTitle(getResources().getString(R.string.ParseLogIn));
-                findPreference("ParseLogin").setEnabled(true);
-                findPreference("ParseNotification").setEnabled(false);
-                findPreference("ParseLogin").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                    @Override
-                    public boolean onPreferenceClick(Preference preference) {
-                        parseLoginDialog.login();
-                        if (ParseUser.getCurrentUser() != null)
-                            SuccessLoggedIn();
-                        return true;
-                    }
-                });
-            }
-        }
+            final Context context = getActivity();
+            final ParseLoginDialog parseLoginDialog = new ParseLoginDialog(context);
+            final Preference parseLogin = findPreference("ParseLogin");
+            final Preference parseNotification = findPreference("ParseNotification");
+            parseLoginDialog.LoginTry(new ParseLoginDialog.OnTaskCompleted() {
+                @Override
+                public void onTaskCompleted(final ParseUser parseUser) {
+                    if (parseUser != null) {
+                        username = parseUser.getUsername();
+                        parseLogin.setSummary(parseUser.getUsername() + getString(R.string.ParseLogInWithName));
+                        parseLogin.setTitle(getString(R.string.ParseLoggedIn));
+                        parseLogin.setEnabled(false);
+                        parseNotification.setEnabled(true);
 
-
-        public void SuccessLoggedIn() {
-            if (ParseUser.getCurrentUser() != null) {
-                findPreference("ParseLogin").setSummary(parseLoginDialog.getUsername() + context.getString(R.string.ParseLogInWithName));
-                findPreference("ParseLogin").setTitle(context.getString(R.string.ParseLoggedIn));
-                findPreference("ParseLogin").setEnabled(false);
-                findPreference("ParseNotification").setEnabled(true);
-                findPreference("ParseNotification").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                    @Override
-                    public boolean onPreferenceClick(Preference preference) {
-                        new ParseSendNotificationDialog(parseLoginDialog.getUsername(), context);
-                        return true;
+                    } else {
+                        parseLogin.setSummary("");
+                        parseLogin.setTitle(getResources().getString(R.string.ParseLogIn));
+                        parseLogin.setEnabled(true);
+                        parseNotification.setEnabled(false);
+                        parseLogin.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                            @Override
+                            public boolean onPreferenceClick(Preference preference) {
+                                parseLoginDialog.LoginNew(new ParseLoginDialog.OnTaskCompleted() {
+                                    @Override
+                                    public void onTaskCompleted(final ParseUser parseUser) {
+                                        if (parseUser != null) {
+                                            username = parseUser.getUsername();
+                                            parseLogin.setSummary(parseUser.getUsername() + context.getString(R.string.ParseLogInWithName));
+                                            parseLogin.setTitle(context.getString(R.string.ParseLoggedIn));
+                                            parseLogin.setEnabled(false);
+                                            parseNotification.setEnabled(true);
+                                        }
+                                    }
+                                });
+                                return true;
+                            }
+                        });
                     }
-                });
-            }
+                }
+            });
+            findPreference("ParseNotification").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    new ParseSendNotificationDialog(username, context);
+                    return true;
+                }
+            });
         }
     }
 

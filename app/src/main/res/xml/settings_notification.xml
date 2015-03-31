@@ -41,10 +41,4 @@
             android:summary="%s"
             android:title="@string/LastPostsNumber" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/ParseSwitchTitle">
-        <CheckBoxPreference
-            android:key="NotificationParseMaintenance"
-            android:summary="@string/ParseSwitchMaintenanceSummary"
-            android:title="@string/ParseSwitchMaintenanceTitle" />
-    </PreferenceCategory>
 </PreferenceScreen>

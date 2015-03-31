@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,7 +21,6 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 
 import hu.zokni1996.android_forum.Main.Splash;
-import hu.zokni1996.android_forum.Parse.ParseError;
 import hu.zokni1996.android_forum.R;
 
 public class MainService extends Service {
@@ -31,7 +31,6 @@ public class MainService extends Service {
     private int NotificationStyleInt;
     private int NotificationRowInt;
     private NotificationCompat.InboxStyle inboxStyle;
-    private ParseError parseError = new ParseError();
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -87,29 +86,13 @@ public class MainService extends Service {
         String[] updatedArray = updatedString.split("THIS_IS_THE_SPLIT");
 
         if (NotificationStyleInt == 1)
-            try {
-                NotificationStyleInt1(titleArray, updatedArray);
-            } catch (Exception e) {
-                parseError.sendError("MainService.class", "NotificationStyleInt 1", "" + e, e.getCause().toString(), e.getMessage());
-            }
+            NotificationStyleInt1(titleArray, updatedArray);
         if (NotificationStyleInt == 2)
-            try {
-                NotificationStyleInt2(titleArray, updatedArray);
-            } catch (Exception e) {
-                parseError.sendError("MainService.class", "NotificationStyleInt 2", "" + e, e.getCause().toString(), e.getMessage());
-            }
+            NotificationStyleInt2(titleArray, updatedArray);
         if (NotificationStyleInt == 3)
-            try {
-                NotificationStyleInt3(titleArray);
-            } catch (Exception e) {
-                parseError.sendError("MainService.class", "NotificationStyleInt 3", "" + e, e.getCause().toString(), e.getMessage());
-            }
+            NotificationStyleInt3(titleArray);
         if (NotificationStyleInt == 4)
-            try {
-                NotificationStyleInt4(titleArray, updatedArray);
-            } catch (Exception e) {
-                parseError.sendError("MainService.class", "NotificationStyleInt 4", "" + e, e.getCause().toString(), e.getMessage());
-            }
+            NotificationStyleInt4(titleArray, updatedArray);
         mBuilder.setStyle(inboxStyle);
         mBuilder.build();
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -158,7 +141,7 @@ public class MainService extends Service {
         NotificationRowInt = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("NotificationRow", "1"));
     }
 
-    private void NotificationStyleInt1(String[] titleArray, String[] updatedArray) throws Exception {
+    private void NotificationStyleInt1(String[] titleArray, String[] updatedArray) {
         String topicNameString = "\u2022 ";
         for (String aNewPostsArray : titleArray) {
             boolean you = true;
@@ -192,7 +175,7 @@ public class MainService extends Service {
             }
     }
 
-    private void NotificationStyleInt2(String[] titleArray, String[] updatedArray) throws Exception {
+    private void NotificationStyleInt2(String[] titleArray, String[] updatedArray) {
         String forumString = "\u2022";
         for (String aNewPostsArray : titleArray) {
             boolean you = true;
@@ -234,12 +217,12 @@ public class MainService extends Service {
             }
     }
 
-    private void NotificationStyleInt3(String[] titleArray) throws Exception {
+    private void NotificationStyleInt3(String[] titleArray) {
         if (titleArray.length >= NotificationRowInt)
             for (int i = 0; i < NotificationRowInt; i++) inboxStyle.addLine(titleArray[i]);
     }
 
-    private void NotificationStyleInt4(String[] titleArray, String[] updatedArray) throws Exception {
+    private void NotificationStyleInt4(String[] titleArray, String[] updatedArray) {
         if (titleArray.length >= NotificationRowInt && updatedArray.length >= NotificationRowInt)
             for (int i = 0; i < NotificationRowInt; i++) {
                 titleArray[i] += updatedArray[i];
@@ -257,14 +240,14 @@ public class MainService extends Service {
                     try {
                         sleep(timeCheck);
                     } catch (InterruptedException e) {
-                        parseError.sendError("MainService.class", "The sleep interrupted:", "" + e, e.getCause().toString(), e.getMessage());
+                        Log.i("MainService.class", "The sleep interrupted " + e.getMessage());
                     }
                 } else {
                     getSettings();
                     try {
                         sleep(timeCheck);
                     } catch (InterruptedException e) {
-                        parseError.sendError("MainService.class", "The sleep interrupted:", "" + e, e.getCause().toString(), e.getMessage());
+                        Log.i("MainService.class", "The sleep interrupted " + e.getMessage());
                     }
                 }
             }
@@ -306,7 +289,7 @@ public class MainService extends Service {
                 /* Get the latest post time */
                 strings[2] = updated.get(0).text();
             } catch (IOException e) {
-                parseError.sendError("MainService.java", "DOWNLOAD_FEED", "" + e, e.getCause().toString(), e.getMessage());
+                Log.i("MainService.java", "DOWNLOAD_FEED " + e.getMessage());
                 ioException = e;
             }
             return strings;

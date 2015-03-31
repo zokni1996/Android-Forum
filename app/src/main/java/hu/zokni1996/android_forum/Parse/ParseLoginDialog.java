@@ -16,29 +16,24 @@ import com.parse.ParseUser;
 import hu.zokni1996.android_forum.R;
 
 public class ParseLoginDialog {
-    Context context;
     EditText usernameEdit;
     EditText passwordEdit;
     View loginButton;
-    MaterialDialog progressDialog;
-    String username;
-    String password;
+    Context context;
 
-    public String getUsername() {
-        return username;
+    public interface OnTaskCompleted {
+        void onTaskCompleted(ParseUser parseUser);
     }
-
 
     public ParseLoginDialog(final Context context) {
         this.context = context;
     }
 
-
-    public void tryToLogIn() {
-        password = context.getSharedPreferences("PASSWORD", Context.MODE_PRIVATE).getString("Password", "");
-        username = context.getSharedPreferences("USERNAME", Context.MODE_PRIVATE).getString("Username", "");
+    public void LoginTry(final OnTaskCompleted listener) {
+        final String password = context.getSharedPreferences("PASSWORD", Context.MODE_PRIVATE).getString("Password", "");
+        final String username = context.getSharedPreferences("USERNAME", Context.MODE_PRIVATE).getString("Username", "");
         if (!username.equals("") && !password.equals("")) {
-            progressDialog = new MaterialDialog.Builder(context)
+            final MaterialDialog progressDialog = new MaterialDialog.Builder(context)
                     .title(context.getString(R.string.ParseLogIn))
                     .content(context.getString(R.string.ParseNotificationPleaseWait))
                     .cancelable(false)
@@ -46,27 +41,29 @@ public class ParseLoginDialog {
             ParseUser.logInInBackground(username, password, new LogInCallback() {
                 public void done(ParseUser user, ParseException e) {
                     if (user != null) {
-                        progressDialog.dismiss();
                         context.getSharedPreferences("PASSWORD", Context.MODE_PRIVATE)
                                 .edit()
                                 .putString("Password", password).commit();
                         context.getSharedPreferences("USERNAME", Context.MODE_PRIVATE)
                                 .edit()
                                 .putString("Username", username).commit();
-                    }
-                    if (user == null){
                         progressDialog.dismiss();
+                        listener.onTaskCompleted(ParseUser.getCurrentUser());
+                    }
+                    if (user == null) {
                         Toast.makeText(context,
                                 context.getString(R.string.ParseFailedLogin),
                                 Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
                     }
                 }
             });
 
         }
+        listener.onTaskCompleted(ParseUser.getCurrentUser());
     }
 
-    public void login() {
+    public void LoginNew(final OnTaskCompleted listener) {
         final MaterialDialog dialog = new MaterialDialog.Builder(context)
                 .customView(R.layout.parse_login, true)
                 .title(context.getString(R.string.ParseLogIn))
@@ -76,9 +73,9 @@ public class ParseLoginDialog {
                 .callback(new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(final MaterialDialog dialog) {
-                        username = usernameEdit.getText().toString();
-                        password = passwordEdit.getText().toString();
-                        progressDialog = new MaterialDialog.Builder(context)
+                        final String username = usernameEdit.getText().toString();
+                        final String password = passwordEdit.getText().toString();
+                        final MaterialDialog progressDialog = new MaterialDialog.Builder(context)
                                 .title(context.getString(R.string.ParseLogIn))
                                 .content(context.getString(R.string.ParseNotificationPleaseWait))
                                 .cancelable(false)
@@ -88,19 +85,20 @@ public class ParseLoginDialog {
                                 new LogInCallback() {
                                     public void done(ParseUser user, ParseException e) {
                                         if (user != null) {
-                                            progressDialog.dismiss();
                                             context.getSharedPreferences("PASSWORD", Context.MODE_PRIVATE)
                                                     .edit()
                                                     .putString("Password", password).commit();
                                             context.getSharedPreferences("USERNAME", Context.MODE_PRIVATE)
                                                     .edit()
                                                     .putString("Username", username).commit();
-                                            dialog.dismiss();
-                                        } else {
                                             progressDialog.dismiss();
+                                            dialog.dismiss();
+                                            listener.onTaskCompleted(ParseUser.getCurrentUser());
+                                        } else {
                                             Toast.makeText(context,
                                                     context.getString(R.string.ParseFailedLogin),
                                                     Toast.LENGTH_SHORT).show();
+                                            progressDialog.dismiss();
                                         }
                                     }
                                 });
