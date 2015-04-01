@@ -27,13 +27,11 @@ import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.parse.LogInCallback;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParsePush;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import hu.zokni1996.android_forum.Favourites.GetFavourites;
@@ -236,8 +234,9 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
             String password = getSharedPreferences("PASSWORD", MODE_PRIVATE).getString("Password", "");
             String username = getSharedPreferences("USERNAME", MODE_PRIVATE).getString("Username", "");
             if (!username.equals("") && !password.equals("")) {
-                ParseUser.logInInBackground(username, password, new LogInCallback() {
-                    public void done(ParseUser user, ParseException e) {
+                ParsePush.subscribeInBackground("moderators", new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
                         if (e == null)
                             getSharedPreferences("PARSE_MODERATORS", MODE_PRIVATE)
                                     .edit()
@@ -278,10 +277,6 @@ public class Main extends ActionBarActivity implements SharedPreferences.OnShare
             webFragment.getWebViewMain().getSettings().setTextZoom(Integer.parseInt(sharedPreferences.getString(key, "100")));
         if (key.equals("Zoom"))
             webFragment.getWebViewMain().getSettings().setBuiltInZoomControls(sharedPreferences.getBoolean(key, false));
-    }
-
-    public static int getActionBarSize() {
-        return actionBar.getHeight();
     }
 
     public static WebFragment getWebFragment() {

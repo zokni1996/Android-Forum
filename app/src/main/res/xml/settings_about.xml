@@ -1,23 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <Preference android:layout="@layout/settings_about" />
-
-    <PreferenceCategory android:title="@string/Other">
-        <Preference
-            android:key="ChangeLog"
-            android:title="@string/ChangeLog" />
-        <Preference
-            android:summary="@string/OpenInBrowserSummary"
-            android:title="@string/OpenInBrowser">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="http://android-forum.hu/" />
-        </Preference>
-        <Preference
-            android:key="BuildVersion"
-            android:summary="@string/application_version"
-            android:title="@string/Version" />
-    </PreferenceCategory>
-
+    <Preference
+        android:layout="@layout/settings_about"
+        android:selectable="false" />
 </PreferenceScreen>

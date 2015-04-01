@@ -1,16 +1,18 @@
 package hu.zokni1996.android_forum.Main;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.view.MenuItem;
 import android.webkit.WebView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -31,16 +33,22 @@ public class Settings extends PreferenceActivity {
 
     static String changeLogHun = "";
     static String changeLogEng = "";
-    static ActionBar actionBar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.StyleThemeSettings);
-
-        actionBar = getActionBar();
-        if (actionBar != null)
-            actionBar.setIcon(R.drawable.ic_action_settings);
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getActionBar().setHomeButtonEnabled(true);
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -51,14 +59,10 @@ public class Settings extends PreferenceActivity {
                 header.iconRes = R.drawable.ic_action_info_outline;
             if (header.titleRes == R.string.ScreenSettings)
                 header.iconRes = R.drawable.ic_hardware_phone_android;
-            if (header.titleRes == R.string.NotificationSettings)
-                header.iconRes = R.drawable.ic_action_announcement;
             if (header.titleRes == R.string.Extras)
                 header.iconRes = R.drawable.ic_image_exposure_plus_1;
             if (header.titleRes == R.string.NameRules)
                 header.iconRes = R.drawable.ic_action_report_problem;
-            if (header.titleRes == R.string.ParseSettingsNotificationName)
-                header.iconRes = R.drawable.ic_action_https;
         }
     }
 
@@ -73,8 +77,6 @@ public class Settings extends PreferenceActivity {
         public void onActivityCreated(Bundle savedInstanceState) {
 
             super.onActivityCreated(savedInstanceState);
-            if (actionBar != null)
-                actionBar.setIcon(R.drawable.ic_image_exposure_plus_1);
             addPreferencesFromResource(R.xml.settings_extras);
             final Context context = getActivity();
             VideoOnPreferenceClick("KeyFirstOne", "f73ZjSQU1Jo");
@@ -148,12 +150,18 @@ public class Settings extends PreferenceActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            if (actionBar != null)
-                actionBar.setIcon(R.drawable.ic_action_info_outline);
-
             addPreferencesFromResource(R.xml.settings_about);
-            final Context context = getActivity();
+        }
+    }
 
+    public static class FragmentSettingsScreen extends PreferenceFragment {
+        String username;
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.settings_screen);
+            final Context context = getActivity();
             PackageInfo info = null;
             try {
                 info = context.getPackageManager().getPackageInfo(
@@ -211,29 +219,61 @@ public class Settings extends PreferenceActivity {
                     return false;
                 }
             });
+            if (updateConnectedFlags(context)) {
+                final ParseLoginDialog parseLoginDialog = new ParseLoginDialog(context);
+                parseLoginDialog.LoginTry(new ParseLoginDialog.OnTaskCompleted() {
+                    @Override
+                    public void onTaskCompleted(final ParseUser parseUser) {
+                        if (parseUser != null) {
+                            username = parseUser.getUsername();
+                            findPreference("ParseLogin").setSummary(parseUser.getUsername() + getString(R.string.ParseLogInWithName));
+                            findPreference("ParseLogin").setTitle(getString(R.string.ParseLoggedIn));
+                            findPreference("ParseLogin").setEnabled(false);
+                            findPreference("ParseNotification").setEnabled(true);
+
+                        } else {
+                            findPreference("ParseLogin").setSummary("");
+                            findPreference("ParseLogin").setTitle(getResources().getString(R.string.ParseLogIn));
+                            findPreference("ParseLogin").setEnabled(true);
+                            findPreference("ParseNotification").setEnabled(false);
+                            findPreference("ParseLogin").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                                @Override
+                                public boolean onPreferenceClick(Preference preference) {
+                                    parseLoginDialog.LoginNew(new ParseLoginDialog.OnTaskCompleted() {
+                                        @Override
+                                        public void onTaskCompleted(final ParseUser parseUser) {
+                                            if (parseUser != null) {
+                                                username = parseUser.getUsername();
+                                                findPreference("ParseLogin").setSummary(parseUser.getUsername() + context.getString(R.string.ParseLogInWithName));
+                                                findPreference("ParseLogin").setTitle(context.getString(R.string.ParseLoggedIn));
+                                                findPreference("ParseLogin").setEnabled(false);
+                                                findPreference("ParseNotification").setEnabled(true);
+                                            }
+                                        }
+                                    });
+                                    return true;
+                                }
+                            });
+                        }
+                    }
+                });
+                findPreference("ParseNotification").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        new ParseSendNotificationDialog(username, context);
+                        return true;
+                    }
+                });
+            }
         }
-    }
 
-    public static class FragmentSettingsScreen extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            if (actionBar != null)
-                actionBar.setIcon(R.drawable.ic_hardware_phone_android);
-
-            addPreferencesFromResource(R.xml.settings_screen);
-        }
-    }
-
-    public static class FragmentSettingsNotification extends PreferenceFragment {
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            if (actionBar != null)
-                actionBar.setIcon(R.drawable.ic_action_announcement);
-
-            addPreferencesFromResource(R.xml.settings_notification);
+        private boolean updateConnectedFlags(Context context) {
+            ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mWifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            NetworkInfo mMobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+            boolean connectedMobile = mMobile.isConnected();
+            boolean connectedWifi = mWifi.isConnected();
+            return connectedMobile || connectedWifi;
         }
     }
 
@@ -241,69 +281,7 @@ public class Settings extends PreferenceActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            if (actionBar != null)
-                actionBar.setIcon(R.drawable.ic_action_report_problem);
-
             addPreferencesFromResource(R.xml.settings_rules);
-        }
-    }
-
-    public static class FragmentSettingsDeveloper extends PreferenceFragment {
-        String username;
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            if (actionBar != null)
-                actionBar.setIcon(R.drawable.ic_action_https);
-            addPreferencesFromResource(R.xml.settings_developer);
-            final Context context = getActivity();
-            final ParseLoginDialog parseLoginDialog = new ParseLoginDialog(context);
-            final Preference parseLogin = findPreference("ParseLogin");
-            final Preference parseNotification = findPreference("ParseNotification");
-            parseLoginDialog.LoginTry(new ParseLoginDialog.OnTaskCompleted() {
-                @Override
-                public void onTaskCompleted(final ParseUser parseUser) {
-                    if (parseUser != null) {
-                        username = parseUser.getUsername();
-                        parseLogin.setSummary(parseUser.getUsername() + getString(R.string.ParseLogInWithName));
-                        parseLogin.setTitle(getString(R.string.ParseLoggedIn));
-                        parseLogin.setEnabled(false);
-                        parseNotification.setEnabled(true);
-
-                    } else {
-                        parseLogin.setSummary("");
-                        parseLogin.setTitle(getResources().getString(R.string.ParseLogIn));
-                        parseLogin.setEnabled(true);
-                        parseNotification.setEnabled(false);
-                        parseLogin.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                            @Override
-                            public boolean onPreferenceClick(Preference preference) {
-                                parseLoginDialog.LoginNew(new ParseLoginDialog.OnTaskCompleted() {
-                                    @Override
-                                    public void onTaskCompleted(final ParseUser parseUser) {
-                                        if (parseUser != null) {
-                                            username = parseUser.getUsername();
-                                            parseLogin.setSummary(parseUser.getUsername() + context.getString(R.string.ParseLogInWithName));
-                                            parseLogin.setTitle(context.getString(R.string.ParseLoggedIn));
-                                            parseLogin.setEnabled(false);
-                                            parseNotification.setEnabled(true);
-                                        }
-                                    }
-                                });
-                                return true;
-                            }
-                        });
-                    }
-                }
-            });
-            findPreference("ParseNotification").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    new ParseSendNotificationDialog(username, context);
-                    return true;
-                }
-            });
         }
     }
 

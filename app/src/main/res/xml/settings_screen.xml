@@ -19,4 +19,70 @@
             android:summary="%s"
             android:title="@string/TextSize" />
     </PreferenceCategory>
+    <PreferenceCategory
+        android:icon="@drawable/ic_stat_af"
+        android:title="@string/NotificationSettings">
+        <CheckBoxPreference
+            android:key="Notification"
+            android:summary="@string/NotificationSummary"
+            android:title="@string/Notification" />
+        <com.afollestad.materialdialogs.prefs.MaterialListPreference
+            android:defaultValue="300000"
+            android:dependency="Notification"
+            android:entries="@array/NotificationTimeCheck"
+            android:entryValues="@array/NotificationTimeCheckNumbers"
+            android:key="NotificationTimeCheck"
+            android:summary="%s"
+            android:title="@string/Refresh" />
+        <com.afollestad.materialdialogs.prefs.MaterialListPreference
+            android:defaultValue="0"
+            android:dependency="Notification"
+            android:entries="@array/NotificationPriority"
+            android:entryValues="@array/NotificationPriorityNumbers"
+            android:key="NotificationPriority"
+            android:summary="%s"
+            android:title="@string/Priority" />
+        <com.afollestad.materialdialogs.prefs.MaterialListPreference
+            android:defaultValue="4"
+            android:dependency="Notification"
+            android:entries="@array/NotificationStyle"
+            android:entryValues="@array/NotificationStyleNumbers"
+            android:key="NotificationStyle"
+            android:summary="%s"
+            android:title="@string/Style" />
+        <com.afollestad.materialdialogs.prefs.MaterialListPreference
+            android:defaultValue="1"
+            android:dependency="Notification"
+            android:entries="@array/NotificationRow"
+            android:entryValues="@array/NotificationRowNumbers"
+            android:key="NotificationRow"
+            android:summary="%s"
+            android:title="@string/LastPostsNumber" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/ParseSettingsNotificationName">
+        <Preference
+            android:title="@string/ParseLogIn"
+            android:summary=""
+            android:key="ParseLogin" />
+        <Preference
+            android:title="@string/ParseSettingsNotificationPreferenceTitle"
+            android:enabled="false"
+            android:key="ParseNotification" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/Other">
+        <Preference
+            android:key="ChangeLog"
+            android:title="@string/ChangeLog" />
+        <Preference
+            android:summary="@string/OpenInBrowserSummary"
+            android:title="@string/OpenInBrowser">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://android-forum.hu/" />
+        </Preference>
+        <Preference
+            android:key="BuildVersion"
+            android:summary="@string/application_version"
+            android:title="@string/Version" />
+    </PreferenceCategory>
 </PreferenceScreen>

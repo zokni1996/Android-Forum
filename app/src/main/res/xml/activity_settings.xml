@@ -5,9 +5,6 @@
         android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsScreen"
         android:title="@string/ScreenSettings" />
     <header
-        android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsNotification"
-        android:title="@string/NotificationSettings" />
-    <header
         android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsRules"
         android:title="@string/NameRules" />
     <header
@@ -16,8 +13,4 @@
     <header
         android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsExtra"
         android:title="@string/Extras" />
-    <header
-        android:fragment="hu.zokni1996.android_forum.Main.Settings$FragmentSettingsDeveloper"
-        android:title="@string/ParseSettingsNotificationName" />
-
 </preference-headers>

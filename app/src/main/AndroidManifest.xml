@@ -43,7 +43,8 @@
             android:theme="@style/ThemeMain" />
         <activity
             android:name=".Main.Settings"
-            android:label="@string/NameSettings" />
+            android:label="@string/NameSettings"
+            android:logo="@android:color/transparent"/>
 
         <service
             android:name=".Main.Service.MainService"

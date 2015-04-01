@@ -1,30 +1,22 @@
 package hu.zokni1996.android_forum.Main.Web;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.webkit.HttpAuthHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.melnykov.fab.FloatingActionButton;
 
@@ -66,60 +58,6 @@ public class WebFragment extends Fragment implements SwipeRefreshLayout.OnRefres
         FloatingActionButtonSETUP();
         ProgressBarSETUP(view);
         webViewMain.setWebViewClient(new WebViewClient() {
-            //TESTING!!!!
-            @Override
-            public void onReceivedHttpAuthRequest(final WebView view, @NonNull final HttpAuthHandler handler, final String host, final String realm) {
-                super.onReceivedHttpAuthRequest(view, handler, host, realm);
-                final Dialog dialog = new Dialog(getActivity().getBaseContext());
-                dialog.setTitle(getString(R.string.ParseLogIn));
-                dialog.setCancelable(false);
-                dialog.setContentView(R.layout.main_on_received_http_auth_request);
-                final Button button = (Button) dialog.findViewById(R.id.buttonHttpAuthRequest);
-                final EditText editTextUsername = (EditText) dialog.findViewById(R.id.editTextHttpAuthRequestUsername);
-                final EditText editTextPassword = (EditText) dialog.findViewById(R.id.editTextHttpAuthRequestPassword);
-                final TextView textView = (TextView) dialog.findViewById(R.id.textViewHttpAuthRequestTitle);
-                textView.setText("The " + host + " need to login for the following website: " + view.getUrl());
-                TextWatcher textWatcher = new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                        if (editTextPassword.getText().toString().length() > 0 &&
-                                editTextUsername.getText().toString().length() > 0)
-                            button.setEnabled(true);
-                        else button.setEnabled(false);
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if (editTextPassword.getText().toString().length() > 0 &&
-                                editTextUsername.getText().toString().length() > 0)
-                            button.setEnabled(true);
-                        else button.setEnabled(false);
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        if (editTextPassword.getText().toString().length() > 0 &&
-                                editTextUsername.getText().toString().length() > 0)
-                            button.setEnabled(true);
-                        else button.setEnabled(false);
-                    }
-                };
-                editTextPassword.addTextChangedListener(textWatcher);
-                editTextUsername.addTextChangedListener(textWatcher);
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        try {
-                            handler.proceed(editTextUsername.getText().toString(), editTextPassword.getText().toString());
-                            handler.useHttpAuthUsernamePassword();
-                            dialog.dismiss();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                dialog.show();
-            }
 
             @Override
             public void onReceivedError(WebView view, int errorCode,
