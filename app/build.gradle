@@ -8,8 +8,8 @@ android {
         applicationId "hu.zokni1996.android_forum"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 17
-        versionName "2.3.3"
+        versionCode 19
+        versionName "2.3.4"
     }
     buildTypes {
         release {

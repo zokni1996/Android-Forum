@@ -55,3 +55,8 @@
 • Rewrite style<br />
 • Deleted unnecessary files<br />
 • Materialized all the application<br />
+<hr /><span style="font-size: 125%; line-height: 116%;"><span style="font-weight: bold"><div style="text-align: center;">• 2.3.4 FINAL •</div></span></span><br />
+• Small bug fixes<br />
+• The login section fixed<br />
+• Rearranged the settings<br />
+• Clean up<br />
